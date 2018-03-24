@@ -14,32 +14,46 @@
 
 # Tuneable varibales
 BACKUP_VOL="/srv/dev-disk-by-label-backup"
-BACKUP_TGT="/srv/dev-disk-by-label-backup/bareos"
+BACKUP_TGT="$BACKUP_VOL/bareos"
 SD_TGT="$BACKUP_TGT/storage"
 BOOTSTRAP_TGT="$BACKUP_TGT/bootstrap"
-WORK_DIR=`pwd`
-GIT_REPO="https://github.com/chymian/bareos-sample"
+
+# Stretch (9.0) uses 16.2
+# BareOS-Repo holds 16.2 for Jessie (8.0)
+# we only install the webui from there, arch: all
+WEBUI_DIST="Debian_8.0"
+WEBUI_RELEASE="release/16.2/"
+WEBUI_ADM="admin"
+# set a password, or it will generatet later
+WEBUI_PW=""
+
+# runtime vars
+WORK_DIR=$(pwd)
+SAMPLE_DIR="$WORK_DIR/sample-conf"
 CONFIG_DOC="$WORK_DIR/BareOs-docu.md"
 SERVER=`hostname`
 
-# Stretch uses 16.2
-# BareOS-Repo holds 16.2 for Deb 8.0
-WEBUI_DIST="Debian_8.0"
-WEBUI_RELEASE="release/16.2/"
-wUI_ADM="admin"
-WEBUI_PW=`pwgen -1 12`
-
+# git stuff
+GIT_REPO_NAME="bareos"
+GIT_REPO="https://github.com/chymian/$GIT_REPO_NAME"
 
 # miscellanious
-DEBIAN_FRONTEND=noninteractive
-USER="bareos"
+BAROS_USER="bareos"
+BAROS_BASE_DIR="/etc/bareos"
+BAREOS-DIR_DIR="$BAROS_BASE_DIR/bareos-dir.d"
+
 PREREQ="pwgen uuid-runtime git make"
-BASE_DIR="/etc/bareos"
-DIR_DIR="$BASE_DIR/bareos-dir.d"
-agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" '
-agu="apt-get update -y"
+agi="apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold"
+agu="apt-get update -y 2> /dev/null"
+DEBIAN_FRONTEND=noninteractive
 
-
+main() {
+	install_prereq
+	install_base
+	restart_daemons
+	install_webui
+	configure_base
+} # main
 
 install_prereq() {
 echo "#####################################################################################
@@ -48,25 +62,36 @@ echo "##########################################################################
 Datum:	`date`
 " >> $CONFIG_DOC
 
-	agi $PREREQ
+	$agu
+	$agi $PREREQ
 
 	# check for backupTarget
-	[ -w $BACKUP_VOL ] || { echo ERR: BackupVolume $BACKUP_VOL does not exist, or is not writable. exiting; exit 1 } 2>
+	[ -w $BACKUP_VOL ] || {
+		echo "ERR: BackupVolume $BACKUP_VOL does not exist, or is not writable. exiting"
+		exit 1
+	}
 
 	# Create Subvolumes
+	btrfs quota enable $BACKUP_VOL
 	btrfs sub cr $BACKUP_TGT
+	btrfs quota enable  $BACKUP_TGT
 	btrfs sub cr $SD_TGT
+	btrfs quota enable $SD_TGT
 	btrfs sub cr $BOOTSTRAP_TGT
+	btrfs quota enable $BOOTSTRAP_TGT
 
 	# add to fstab
 	grep -v "/var/lib/bareos" /etc/fstab > /tmp/fstab.tmp
-	printf "/dev/disk/by-label/backup\t\t\t/var/lib/bareos\t\tnone\tbind,subvol=bareos\t0 0\n" >> /tmp/fstab.tmp
+	printf "$BACKUP_TGT\t\t\t/var/lib/bareos\t\tnone\tbind\t0 0\n" >> /tmp/fstab.tmp
 	mv --backup=t /tmp/fstab.tmp /etc/fstab
 
 	# create mountpoint
 	mkdir -p /var/lib/bareos
 	# mount the $BACKUP_TGT
-	mount /var/lib/bareos || { echo ERR: Cannot mount $BACKUP_TGT on /var/lib/bareos. exiting; exit 2 } 2>
+	mount /var/lib/bareos || {
+		echo "ERR: Cannot mount $BACKUP_TGT on /var/lib/bareos. exiting"
+		exit 2
+	}
 
 
 echo "## Targets are mounted under \`\`\`/var/lib/bareos\`\`\` and available on:
@@ -76,27 +101,28 @@ Storage Target:		$SD_TGT
 Bootstrap Target:	$BOOTSTRAP_TGT
 " >> $CONFIG_DOC
 
-	# get git-repo with my sample-configs
-	cd $WORK_DIR
-	[ ! -d bareos-sample ] && git clone $GIT
-}
+	# update git-repo with my sample-configs
+	git pull
+
+} # install_prereq
 
 install_base() {
 	agu
 	agi postgresql
 	agi bareos bareos-database-postgresql
-	chown -R $USER. $SD_TGT $WORK_DIR/bareos-sample
+	chown -R $BAROS_USER. $SD_TGT $SAMPLE_DIR/bareos-sample
 
 	# to use the directory-structure (>=16.2), move old-style conf-files out of the way
-	cd $BASE_DIR
+	cd $BAROS_BASE_DIR
 	mv bareos-dir.conf .bareos-dir.conf
 	mv bareos-fd.conf .bareos-fd.conf
 	mv bareos-sd.conf .bareos-sd.conf
 	mv bareos-dir.conf.dist .bareos-dir.conf.dist
 	mv bareos-fd.conf.dist .bareos-fd.conf.dist
 	mv bareos-sd.conf.dist .bareos-sd.conf.dist
+	find -t file -exec chmod 644 {} \;
 
-}
+} # install_base
 
 install_webui() {
 	URL=http://download.bareos.org/bareos/$WEBUI_RELEASE/$WEBUI_DIST
@@ -116,8 +142,12 @@ install_webui() {
 	a2dissite 000-default
 	service  apache2 restart
 
+	# generate a PW if empty
+	WEBUI_PW=${WEBUI_PW:-$(pwgen -1 12)}
+
 	echo "configure add console name=$WEBUI_ADM password=$WEBUI_PW profile=webui-admin"|bconsole
 	reload_director
+
 	echo "
 ## Webinterface
 Link: [http://$SERVER:81/bareos-webui/](http://$SERVER:81/bareos-webui/)
@@ -125,7 +155,7 @@ Link: [http://$SERVER:81/bareos-webui/](http://$SERVER:81/bareos-webui/)
 WebUI User:     $WEBUI_ADM
 WebUI Password: $WEBUI_PW
 	" >> $CONFIG_DOC
-}
+} # install_webui
 
 
 
@@ -137,15 +167,15 @@ configure_base() {
 	for i in `grep bareos-mon -lr * `; do sed -i s/bareos-mon/$SERVER-mon/g $i; done
 	for i in `grep bareos-sd -lr * `; do sed -i s/bareos-sd/$SERVER-sd/g $i; done
 
-	# copy the sample-configs to $BASE_DIR
-	cp --backup=t -a $WORK_DIR/bareos-sample/* $BASE_DIR
+	# copy the sample-configs to $BAROS_BASE_DIR
+	cp --backup=t -a $SAMPLE_DIR/* $BAROS_BASE_DIR
 
-	#sed -i "s/Address = .*/Address = $SERVER/g" $BASE_DIR/bareos-dir.d/storage/File.conf
-}
+	#sed -i "s/Address = .*/Address = $SERVER/g" $BAROS_BASE_DIR/bareos-dir.d/storage/File.conf
+} # configure_base
 
-conf_fileset() {
+#conf_fileset() {
 	# Using configured basic Filesets from GIT
-}
+#} # conf_fileset
 
 
 
@@ -153,19 +183,16 @@ conf_fileset() {
 
 
 restart_daemons() {
+	chmod -R $BAROS_USER $BAROS_BASE_DIR
 	service bareos-dir restart
 	service bareos-fd restart
 	service bareos-sd restart
-}
+} #restart_daemons
 
 reload_director(){
 	echo reload | bconsole
-}
+} #reload_director
 
 # Main
+main
 
-install_prereq
-install_base
-restart_daemons
-install_webui
-configure_base

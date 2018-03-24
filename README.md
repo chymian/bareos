@@ -5,16 +5,20 @@ Using Openmediavault NAS as Base system.
 At the time of writing, it's OMV Arrakis 4.0 on Debian 9 Stretch.
 
 ## Prerequisites
-Create a Backup-Volume/Partiton on the RAID/Disk with lable **backup**.  
+Create a Backup-Volume/Partiton on the RAID/Disk with label **backup**.  
 The Volume with the Subvolume bareos will be mounted on ```/var/lib/bareos/``` to hold all BareOS relevant files.
 ```
-BACKUP_VOL=/srv/dev-disk-by-label-backup/
+BACKUP_VOL=/srv/dev-disk-by-label-backup
 btrfs sub cr $BACKUP_VOL/bareos
+btrfs quota enable $BACKUP_VOL/bareos/
 btrfs sub cr $BACKUP_VOL/bareos/storage
+btrfs quota enable $BACKUP_VOL/bareos/storage
 btrfs sub cr $BACKUP_VOL/bareos/bootstrap
+btrfs quota enable $BACKUP_VOL/bareos/bootstrap
 
 grep -v "/var/lib/bareos" /etc/fstab > /tmp/fstab.tmp
-printf "/dev/disk/by-label/backup\t\t\t/var/lib/bareos\t\tnone\tbind,subvol=bareos\t0 0\n" >> /tmp/fstab.tmp
+printf "$BACKUP_VOL/bareos\t\t\t/var/lib/bareos\t\tnone\tbind\t0 0\n" >> /tmp/fstab.tmp
+
 mv --backup=t /tmp/fstab.tmp /etc/fstab
 mkdir -p /var/lib/bareos
 mount /var/lib/bareos
@@ -205,7 +209,7 @@ Exclude {
 
 ```
 # standard filessystems
-cat /etc/fstab|egrep -v "^#|^$|swap|bind|iso|svfs|proc|tmp|devfs|sysfs"|awk '{print $2}'|egrep -v "^/media|^/mnt|docker"
+cat /etc/fstab|egrep -v "^#|^$|swap|bind|iso|svfs|proc|tmp|devfs|sysfs|ram"|awk '{print $2}'|egrep -v "^/media|^/mnt|docker"
 # @hansa,
 # add /srv/media/music
 # filter /srv/virt/images
