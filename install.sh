@@ -40,11 +40,11 @@ GIT_REPO="https://github.com/chymian/$GIT_REPO_NAME"
 # miscellanious
 BAROS_USER="bareos"
 BAROS_BASE_DIR="/etc/bareos"
-BAREOS-DIR_DIR="$BAROS_BASE_DIR/bareos-dir.d"
+BAREOSDIR_DIR="$BAROS_BASE_DIR/bareos-dir.d"
 
 PREREQ="pwgen uuid-runtime git make"
-agi="apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold"
-agu="apt-get update -y 2> /dev/null"
+agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
+agu='apt-get update'
 DEBIAN_FRONTEND=noninteractive
 
 main() {
@@ -62,8 +62,8 @@ echo "##########################################################################
 Datum:	`date`
 " >> $CONFIG_DOC
 
-	$agu
-	$agi $PREREQ
+	$agu  >/dev/null 2>&1
+	$agi $PREREQ  >/dev/null 2>&1
 
 	# check for backupTarget
 	[ -w $BACKUP_VOL ] || {
@@ -73,11 +73,11 @@ Datum:	`date`
 
 	# Create Subvolumes
 	btrfs quota enable $BACKUP_VOL
-	btrfs sub cr $BACKUP_TGT
+	[ -d $BACKUP_TGT ] || btrfs sub cr $BACKUP_TGT
 	btrfs quota enable  $BACKUP_TGT
-	btrfs sub cr $SD_TGT
+	[ -d $SD_TGT ] || btrfs sub cr $SD_TGT
 	btrfs quota enable $SD_TGT
-	btrfs sub cr $BOOTSTRAP_TGT
+	[ -d $BOOTSTRAP_TGT ] || btrfs sub cr $BOOTSTRAP_TGT
 	btrfs quota enable $BOOTSTRAP_TGT
 
 	# add to fstab
@@ -101,16 +101,17 @@ Storage Target:		$SD_TGT
 Bootstrap Target:	$BOOTSTRAP_TGT
 " >> $CONFIG_DOC
 
+
 	# update git-repo with my sample-configs
+	$WORK_DIR
 	git pull
 
 } # install_prereq
 
 install_base() {
-	agu
-	agi postgresql
-	agi bareos bareos-database-postgresql
-	chown -R $BAROS_USER. $SD_TGT $SAMPLE_DIR/bareos-sample
+	$agi postgresql >/dev/null 2>&1
+	$agi bareos bareos-database-postgresql >/dev/null 2>&1
+	chown -R $BAROS_USER. $SD_TGT $SAMPLE_DIR
 
 	# to use the directory-structure (>=16.2), move old-style conf-files out of the way
 	cd $BAROS_BASE_DIR
@@ -120,7 +121,7 @@ install_base() {
 	mv bareos-dir.conf.dist .bareos-dir.conf.dist
 	mv bareos-fd.conf.dist .bareos-fd.conf.dist
 	mv bareos-sd.conf.dist .bareos-sd.conf.dist
-	find -t file -exec chmod 644 {} \;
+	find -type f -exec chmod 644 {} \;
 
 } # install_base
 
@@ -130,11 +131,10 @@ install_webui() {
 	printf "deb $URL /\n" > /etc/apt/sources.list.d/bareos.list
 
 	# add package key
-	wget -q $URL/Release.key -O- | apt-key add -
+	wget -q $URL/Release.key -O- | apt-key add - >/dev/null 2>&1'
 
 	# install Bareos packages
-	agu
-	agi bareos-webui
+	agi bareos-webui >/dev/null 2>&1'
 
 	# adjusting Apache2 to coexists with nginx
 	sed -i s/80/81/g ports.conf
@@ -183,7 +183,7 @@ configure_base() {
 
 
 restart_daemons() {
-	chmod -R $BAROS_USER $BAROS_BASE_DIR
+	chown -R $BAROS_USER $BAROS_BASE_DIR
 	service bareos-dir restart
 	service bareos-fd restart
 	service bareos-sd restart

@@ -1,12 +1,12 @@
 # BareOS Backup System
 see also: [BareOS Manual](http://doc.bareos.org/master/html/bareos-manual-main-reference.html#InstallChapter)
 
-Using Openmediavault NAS as Base system.  
+Using Openmediavault NAS-Server as Basesystem.  
 At the time of writing, it's OMV Arrakis 4.0 on Debian 9 Stretch.
 
 ## Prerequisites
 Create a Backup-Volume/Partiton on the RAID/Disk with label **backup**.  
-The Volume with the Subvolume bareos will be mounted on ```/var/lib/bareos/``` to hold all BareOS relevant files.
+The Volume with the Subvolume bareos will be mounted on ```/var/lib/bareos/``` to hold all BareOS relevant data-files.
 ```
 BACKUP_VOL=/srv/dev-disk-by-label-backup
 btrfs sub cr $BACKUP_VOL/bareos
