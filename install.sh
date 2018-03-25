@@ -135,19 +135,21 @@ Bootstrap Target:	$BOOTSTRAP_TGT
 install_base() {
 
 	# Preseeding debconf for not getting asked during installation
-	echo bareos-database-common/database-type         pgsql                                    | debconf-set-selections
-	echo bareos-database-common/remote/host	          localhost                                | debconf-set-selections
 
-	echo bareos-database-common/pgsql/admin-user      ${PGSQL_ADMIN:-postgres}                 | debconf-set-selections
-	echo bareos-database-common/pgsql/admin-pass      ${PGSQL_ADMIN_PW:-$(pwgen -1 13)}        | debconf-set-selections
-	echo bareos-database-common/password-confirm      ${PGSQL_ADMIN_PW}                        | debconf-set-selections
+	echo bareos-database-common dbconfig-install       boolean	 true					| debconf-set-selections
+	echo bareos-database-common database-type          select	 pgsql					| debconf-set-selections
+	echo bareos-database-common remote/host	           select	 localhost				| debconf-set-selections
 
-	echo bareos-database-common/db/app-user           ${PGSQL_BAREOSDB_USER:-bareos@localhost} | debconf-set-selections
-	echo bareos-database-common/db/dbname             ${PGSQL_BAREOSDB_NAME:-bareos}           | debconf-set-selections
-	echo bareos-database-common/pgsql/app-pass        ${PGSQL_BAREOSDB_PW:-$(pwgen -1 13)}     | debconf-set-selections
-	echo bareos-database-common/app-password-confirm  ${PGSQL_BAREOSDB_PW}                     | debconf-set-selections
+	echo bareos-database-common pgsql/admin-user       string	 ${PGSQL_ADMIN:-postgres}		| debconf-set-selections
+	echo bareos-database-common pgsql/admin-pass       password	 ${PGSQL_ADMIN_PW:-$(pwgen -1 13)}	| debconf-set-selections
+	echo bareos-database-common password-confirm       password	 ${PGSQL_ADMIN_PW}			| debconf-set-selections
+
+	echo bareos-database-common pgsql/app-pass         password	 ${PGSQL_BAREOSDB_PW:-$(pwgen -1 13)}	| debconf-set-selections
+	echo bareos-database-common app-password-confirm   password	 ${PGSQL_BAREOSDB_PW}			| debconf-set-selections
 
 
+	#echo bareos-database-common/db/dbname              | debconf-set-selections
+	#echo bareos-database-common/db/app-user            | debconf-set-selections
 
 	$agi postgresql
 	$agi bareos bareos-database-postgresql
