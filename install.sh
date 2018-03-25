@@ -27,6 +27,21 @@ WEBUI_ADM="admin"
 # set a password, or it will be generated later
 WEBUI_PW=""
 
+# Preseeding Postgresql Passwords
+# defaults to "postgres"
+PGSQL_ADMIN=""
+# if left blank, will be genareted
+PGSQL_ADMIN_PW=""
+
+# defaults to "bareos@localhost"
+PGSQL_BAREOSDB_USER=""
+# defaults to "bareos"
+PGSQL_BAREOSDB_NAME=""
+# if left blank, will be genareted
+PGSQL_BAREOSDB_PW=""
+
+
+
 # runtime vars
 WORK_DIR=$(pwd)
 SAMPLE_DIR="$WORK_DIR/sample-conf"
@@ -118,6 +133,22 @@ Bootstrap Target:	$BOOTSTRAP_TGT
 } # install_prereq
 
 install_base() {
+
+	# Preseeding debconf for not getting asked during installation
+	echo bareos-database-common/database-type         pgsql                                    | debconf-set-selections
+	echo bareos-database-common/remote/host	          localhost                                | debconf-set-selections
+
+	echo bareos-database-common/pgsql/admin-user      ${PGSQL_ADMIN:-postgres}                 | debconf-set-selections
+	echo bareos-database-common/pgsql/admin-pass      ${PGSQL_ADMIN_PW:-$(pwgen -1 13)}        | debconf-set-selections
+	echo bareos-database-common/password-confirm      ${PGSQL_ADMIN_PW}                        | debconf-set-selections
+
+	echo bareos-database-common/db/app-user           ${PGSQL_BAREOSDB_USER:-bareos@localhost} | dbconf-set-selections
+	echo bareos-database-common/db/dbname             ${PGSQL_BAREOSDB_NAME:-bareos}           | dbconf-set-selections
+	echo bareos-database-common/pgsql/app-pass        ${PGSQL_BAREOSDB_PW:-$(pwgen -1 13)}     | debconf-set-selections
+	echo bareos-database-common/app-password-confirm  ${PGSQL_BAREOSDB_PW}                     | debconf-set-selections
+
+
+
 	$agi postgresql
 	$agi bareos bareos-database-postgresql
 	chown -R $BAROS_USER. $SD_TGT $SAMPLE_DIR
@@ -131,6 +162,12 @@ install_base() {
 	[ -f bareos-fd.conf.dist  ] && mv bareos-fd.conf.dist .bareos-fd.conf.dist
 	[ -f bareos-sd.conf.dist  ] && mv bareos-sd.conf.dist .bareos-sd.conf.dist
 	find . -type f -exec chmod 644 {} \;
+
+	echo "## Database Passwords
+PostgreSQL Admin:	$PGSQL_ADMIN_PW
+BareOS DB:		$PGSQL_BAREOSDB_PW
+" >> $CONFIG_DOC
+
 
 } # install_base
 
