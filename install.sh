@@ -136,12 +136,14 @@ install_base() {
 
 install_webui() {
 
-	$agi bareos-webui
-
+	$agi bareos-webui apache2
+	restart_daemons
 	# adjusting Apache2 to coexists with nginx
+	cd /etc/apache2
 	sed -i s/80/81/g ports.conf
 	sed -i s/443/8443/g ports.conf
 	a2dissite 000-default
+	a2enconf bareos-webui
 	service  apache2 restart
 
 	# generate a PW if empty
