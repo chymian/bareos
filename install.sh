@@ -142,8 +142,8 @@ install_base() {
 	echo bareos-database-common/pgsql/admin-pass      ${PGSQL_ADMIN_PW:-$(pwgen -1 13)}        | debconf-set-selections
 	echo bareos-database-common/password-confirm      ${PGSQL_ADMIN_PW}                        | debconf-set-selections
 
-	echo bareos-database-common/db/app-user           ${PGSQL_BAREOSDB_USER:-bareos@localhost} | dbconf-set-selections
-	echo bareos-database-common/db/dbname             ${PGSQL_BAREOSDB_NAME:-bareos}           | dbconf-set-selections
+	echo bareos-database-common/db/app-user           ${PGSQL_BAREOSDB_USER:-bareos@localhost} | debconf-set-selections
+	echo bareos-database-common/db/dbname             ${PGSQL_BAREOSDB_NAME:-bareos}           | debconf-set-selections
 	echo bareos-database-common/pgsql/app-pass        ${PGSQL_BAREOSDB_PW:-$(pwgen -1 13)}     | debconf-set-selections
 	echo bareos-database-common/app-password-confirm  ${PGSQL_BAREOSDB_PW}                     | debconf-set-selections
 

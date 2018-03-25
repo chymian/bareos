@@ -65,7 +65,7 @@ wget -q $URL/Release.key -O- | apt-key add -
 
 # install Bareos packages
 apt-get update
-apt-get install bareos-webui
+apt-get install bareos-webui apache2 libapache2-mod-php
 
 # adjusting Apach2 to coexists with nginx
 sed -i s/80/81/g ports.conf
@@ -81,7 +81,7 @@ service bareos-fd restart
 service bareos-sd restart
 
 WEBUI_ADM="admin"
-WEBUI_PW=`pwgen -1 12`
+WEBUI_PW=${WEBUI_PW:-$(pwgen -1 12)}
 
 bconsole << EOF
 configure add console \
