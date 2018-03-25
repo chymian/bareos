@@ -50,7 +50,7 @@ Using the WebUI from 16.2, which correspondes to Debian 8 @ the BareOS-Repo.
 DIST=Debian_8.0
 # DIST=xUbuntu_16.04
 
-RELEASE=release/16.2/
+RELEASE=release/16.2
 # or
 # RELEASE=release/latest/
 # RELEASE=experimental/nightly/
