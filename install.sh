@@ -187,7 +187,7 @@ configure_base() {
 	if [ `grep -ci fileset $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf` = 1 ] ; then
 		sed -i "s/.ile.et.*/FileSet = LinuxHC/g" $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
 	else
-		sed -i "s/\}/FileSet = LinuxHC\n  \}/g" $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
+		sed -i "s/\}/  FileSet = LinuxHC\n  \}/g" $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
 	fi
 
 } # configure_base
