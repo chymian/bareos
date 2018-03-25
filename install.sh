@@ -6,7 +6,7 @@
 # except webUI, which is taken from bareos-repros, it's all from debian-repos
 # since BareOS-Repos don't have arm(hf)-binaries
 #
-# GPLv2
+# MIT licence
 # 2018.03.21, dev@eb8.org
 #
 
@@ -22,7 +22,7 @@ BOOTSTRAP_TGT="$BACKUP_TGT/bootstrap"
 # BareOS-Repo holds 16.2 for Jessie (8.0)
 # we only install the webui from there, arch: all
 WEBUI_DIST="Debian_8.0"
-WEBUI_RELEASE="release/16.2/"
+WEBUI_RELEASE="release/16.2"
 WEBUI_ADM="admin"
 # set a password, or it will generatet later
 WEBUI_PW=""
@@ -115,13 +115,13 @@ install_base() {
 
 	# to use the directory-structure (>=16.2), move old-style conf-files out of the way
 	cd $BAROS_BASE_DIR
-	mv bareos-dir.conf .bareos-dir.conf
-	mv bareos-fd.conf .bareos-fd.conf
-	mv bareos-sd.conf .bareos-sd.conf
-	mv bareos-dir.conf.dist .bareos-dir.conf.dist
-	mv bareos-fd.conf.dist .bareos-fd.conf.dist
-	mv bareos-sd.conf.dist .bareos-sd.conf.dist
-	find -type f -exec chmod 644 {} \;
+	[ -f bareos-dir.conf ] && mv bareos-dir.conf .bareos-dir.conf
+	[ -f bareos-fd.conf  ] && mv bareos-fd.conf .bareos-fd.conf
+	[ -f bareos-sd.conf  ] && mv bareos-sd.conf .bareos-sd.conf
+	[ -f bareos-dir.conf.dist ] && mv bareos-dir.conf.dist .bareos-dir.conf.dist
+	[ -f bareos-fd.conf.dist  ] && mv bareos-fd.conf.dist .bareos-fd.conf.dist
+	[ -f bareos-sd.conf.dist  ] && mv bareos-sd.conf.dist .bareos-sd.conf.dist
+	find . -type f -exec chmod 644 {} \;
 
 } # install_base
 
@@ -134,7 +134,8 @@ install_webui() {
 	wget -q $URL/Release.key -O- | apt-key add - >/dev/null 2>&1'
 
 	# install Bareos packages
-	agi bareos-webui >/dev/null 2>&1'
+	$agu  >/dev/null 2>&1
+	$agi bareos-webui >/dev/null 2>&1'
 
 	# adjusting Apache2 to coexists with nginx
 	sed -i s/80/81/g ports.conf
@@ -171,10 +172,25 @@ configure_base() {
 	cp --backup=t -a $SAMPLE_DIR/* $BAROS_BASE_DIR
 
 	#sed -i "s/Address = .*/Address = $SERVER/g" $BAROS_BASE_DIR/bareos-dir.d/storage/File.conf
+
+	# make sure, client is set in job/BackupCatalog.conf
+	if [ `grep -ci client $BAREOSDIR_DIR/job/BackupCatalog.conf` = 1 ] ; then
+		sed -i "s/.ient.*/lient = $SERVER-fd/g" $BAREOSDIR_DIR/job/BackupCatalog.conf
+	else
+		sed -i "s/Level/Client = $SERVER-fd\n  Level/g" $BAREOSDIR_DIR/job/BackupCatalog.conf
+	fi
+	# make sure, fileset ist set in Job "backup-$SERVER-fd" 
+	mv $BAREOSDIR_DIR/job/backup-bareos-fd.conf $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
+	if [ `grep -ci fileset $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf` = 1 ] ; then
+		sed -i "s/.ile.et.*/FileSet = LinuxHC/g" $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
+	else
+		sed -i "s/\}/FileSet = LinuxHC\n  \}/g" $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
+	fi
+
 } # configure_base
 
 #conf_fileset() {
-	# Using configured basic Filesets from GIT
+	# using configured basic filesets from GIT
 #} # conf_fileset
 
 
@@ -183,7 +199,7 @@ configure_base() {
 
 
 restart_daemons() {
-	chown -R $BAROS_USER $BAROS_BASE_DIR
+	chown -R $BAROS_USER. $BAROS_BASE_DIR
 	service bareos-dir restart
 	service bareos-fd restart
 	service bareos-sd restart
