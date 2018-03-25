@@ -136,7 +136,7 @@ install_base() {
 
 install_webui() {
 
-	$agi bareos-webui apache2
+	$agi bareos-webui apache2 libapache2-mod-php
 	restart_daemons
 	# adjusting Apache2 to coexists with nginx
 	cd /etc/apache2
