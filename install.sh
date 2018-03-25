@@ -136,7 +136,7 @@ install_base() {
 
 install_webui() {
 
-	$agi bareos-webui >/dev/null 2>&1'
+	$agi bareos-webui
 
 	# adjusting Apache2 to coexists with nginx
 	sed -i s/80/81/g ports.conf
