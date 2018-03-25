@@ -62,8 +62,17 @@ echo "##########################################################################
 Datum:	`date`
 " >> $CONFIG_DOC
 
+	# add repo for webUI
+	URL=http://download.bareos.org/bareos/$WEBUI_RELEASE/$WEBUI_DIST
+	# add the Bareos repository
+	printf "deb $URL /\n" > /etc/apt/sources.list.d/bareos.list
+
+	# add package key
+	wget -q $URL/Release.key -O- | apt-key add -
+
+	# install Bareos packages
 	$agu  >/dev/null 2>&1
-	$agi $PREREQ  >/dev/null 2>&1
+	$agi $PREREQ
 
 	# check for backupTarget
 	[ -w $BACKUP_VOL ] || {
@@ -109,7 +118,7 @@ Bootstrap Target:	$BOOTSTRAP_TGT
 } # install_prereq
 
 install_base() {
-	$agi postgresql >/dev/null 2>&1
+	$agi postgresql
 	$agi bareos bareos-database-postgresql
 	chown -R $BAROS_USER. $SD_TGT $SAMPLE_DIR
 
@@ -126,15 +135,7 @@ install_base() {
 } # install_base
 
 install_webui() {
-	URL=http://download.bareos.org/bareos/$WEBUI_RELEASE/$WEBUI_DIST
-	# add the Bareos repository
-	printf "deb $URL /\n" > /etc/apt/sources.list.d/bareos.list
 
-	# add package key
-	wget -q $URL/Release.key -O- | apt-key add - >/dev/null 2>&1'
-
-	# install Bareos packages
-	$agu  >/dev/null 2>&1
 	$agi bareos-webui >/dev/null 2>&1'
 
 	# adjusting Apache2 to coexists with nginx
