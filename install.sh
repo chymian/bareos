@@ -24,7 +24,7 @@ BOOTSTRAP_TGT="$BACKUP_TGT/bootstrap"
 WEBUI_DIST="Debian_8.0"
 WEBUI_RELEASE="release/16.2"
 WEBUI_ADM="admin"
-# set a password, or it will generatet later
+# set a password, or it will be generated later
 WEBUI_PW=""
 
 # runtime vars
