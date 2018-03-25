@@ -103,14 +103,14 @@ Bootstrap Target:	$BOOTSTRAP_TGT
 
 
 	# update git-repo with my sample-configs
-	$WORK_DIR
+	cd $WORK_DIR
 	git pull
 
 } # install_prereq
 
 install_base() {
 	$agi postgresql >/dev/null 2>&1
-	$agi bareos bareos-database-postgresql >/dev/null 2>&1
+	$agi bareos bareos-database-postgresql
 	chown -R $BAROS_USER. $SD_TGT $SAMPLE_DIR
 
 	# to use the directory-structure (>=16.2), move old-style conf-files out of the way
