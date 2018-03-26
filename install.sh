@@ -61,7 +61,9 @@ PREREQ="pwgen uuid-runtime git make mailutils pandoc"
 agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
 agu='apt-get update'
 DEBIAN_FRONTEND=noninteractive
-MAIL_PROG=/usr/bin/mail.mailutils
+mail_prog=/usr/bin/mail.mailutils
+HTML_TGT=/var/www/html
+CFG_TAR=bareos-etc.tar.gz
 
 usage() {
 # Switches not implemented yes
@@ -276,8 +278,9 @@ OS:         $(lsb_release -d)
 BareOS:     $(apt-cache show policy bareos|grep Version)
 PostgreSQL: $(apt-cache show policy postgresql|grep Version)
 ```
+A tarball of the configuration Directory $BAREOS_BASE_DIR is available at [http://$SERVER:81/$CFG_TAR](http://$SERVER:81/$CFG_TAR)
 
-This Page is also availlable on: [http://$SERVER:81/bareos-doc](http://$SERVER:81/bareos-doc/)
+This Page is also availlable on: [http://$SERVER:81/bareos-doc.html](http://$SERVER:81/bareos-doc.html)
 
 " >> $CONFIG_DOC
 
@@ -306,10 +309,15 @@ reload_director(){
 } #reload_director
 
 finish_docu() {
+	cd /etc
+	tar czf $WORK_DIR/$CFG_TAR bareos
+	cp $WORK_DIR/$CFG_TAR $HTML_TGT
+	cp $WORK_DIR/$CFG_TAR /root
+	cd $WORK_DIR
 	cp $CONFIG_DOC /root
-	pandoc -f markdown_github  -t plain ${CONFIG_DOC} |mailx -s "Backupserver BareOS Installation Doku" -A ${CONFIG_DOC}  root
-	pandoc --ascii -f markdown_github  -t html ${CONFIG_DOC} >/var/www/html/$(basename $CONFIG_DOC .md).html
-}
+	pandoc -f markdown_github -t plain ${CONFIG_DOC} |$mail_prg -s "Backupserver BareOS Installation Report" -A ${CONFIG_DOC} -A $WORK_DIR/$CFG_TAR root
+	pandoc --ascii -f markdown_github -t html ${CONFIG_DOC} > $HTML_TGT/$(basename $CONFIG_DOC .md).html
+} # finish_docu
 
 # Main
 main

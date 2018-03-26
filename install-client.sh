@@ -40,6 +40,10 @@ PREREQ="pwgen uuid-runtime git make"
 agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
 agu='apt-get update'
 DEBIAN_FRONTEND=noninteractive
+mail_prog=/usr/bin/mail.mailutils
+HTML_TGT=/var/www/html
+CFG_TAR=bareos-etc.tar.gz
+
 
 usage() {
 	echo "usage: $0: [-d <jobdef> -f <fileset>] <clientname>
@@ -48,7 +52,7 @@ clientname can be a resolvable Hostname or an IP-Address.
 
    -j  Use Jobdef <name> instaed of Default JobDef
    -f  Use FileSet <name> instaed of Default FileSet
-   -m  Mail the Config-Doku
+   -m  Mail the Config-Docu & update html-page
    Without Parameters, all existing JobDefs and FileSets will be listed.
 "
 } # usage
@@ -69,7 +73,7 @@ main() {
 				shift; shift
 				;;
 			-m)
-				MAIL_DOC=true
+				FINISH_DOCU=true
 				shift
 				;;
 			*)
@@ -79,7 +83,7 @@ main() {
 		esac
 	fi
 
-	$MAIL_DOC && mail_doc
+	$FINISH_DOCU && finish_docu
 } #main
 
 client_job() {
@@ -96,13 +100,21 @@ EOF
 
 echo "
 ## Client added
+```
 Hostname/IP: $1
 JobDef:      $2
 Fileset:     $3
-"
+```
+" >> $CONFIG_DOC
 } # client_job
 
-mail_doc() {
-	pandoc -f markdown_github  -t plain ${CONFIG_DOC} |mailx -s "Backupserver BareOS Installation Doku" -A ${CONFIG_DOC}  root
-	pandoc --ascii -f markdown_github  -t html ${CONFIG_DOC} >/var/www/html/$(basename $CONFIG_DOC .md).html
-} # mail_doc
+finish_docu() {
+	cd /etc
+	tar czf $WORK_DIR/$CFG_TAR bareos
+	cp $WORK_DIR/$CFG_TAR $HTML_TGT
+	cp $WORK_DIR/$CFG_TAR /root
+	cd $WORK_DIR
+	cp $CONFIG_DOC /root
+	pandoc -f markdown_github -t plain ${CONFIG_DOC} |$mail_prg -s "Backupserver BareOS Installation Report" -A ${CONFIG_DOC} -A $WORK_DIR/$CFG_TAR root
+	pandoc --ascii -f markdown_github -t html ${CONFIG_DOC} > $HTML_TGT/$(basename $CONFIG_DOC .md).html
+} # finish_docu
