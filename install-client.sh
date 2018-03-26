@@ -48,7 +48,7 @@ clientname can be a resolvable Hostname or an IP-Address.
 
    -j  Use Jobdef <name> instaed of Default JobDef
    -f  Use FileSet <name> instaed of Default FileSet
-
+   -m  Mail the Config-Doku
    Without Parameters, all existing JobDefs and FileSets will be listed.
 "
 } # usage
@@ -68,12 +68,18 @@ main() {
 				FILESET=$2
 				shift; shift
 				;;
+			-m)
+				MAIL_DOC=true
+				shift
+				;;
 			*)
 				CLIENT=$1
 				shift
 				client_job ${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
 		esac
 	fi
+
+	$MAIL_DOC && mail_doc
 } #main
 
 client_job() {
@@ -95,3 +101,7 @@ JobDef:     |$2
 Fileset:    |$3
 "
 } # client_job
+
+mail_doc() {
+	cat $CONFIG_DOC | mailx -s "BareOS Configuration" root
+} # mail_doc
