@@ -85,13 +85,11 @@ main() {
 } # main
 
 install_prereq() {
-echo "#####################################################################################
+echo "# BareOS Backup Server
 
-# BareOS Backup Server
-
-Installation on: $SERVER
-Date:           `date`
-BarOS Version:  16.2
+Installation on:|$SERVER
+Date:           |`date`
+BarOS Version:  |16.2
 
 " >> $CONFIG_DOC
 
@@ -137,10 +135,10 @@ BarOS Version:  16.2
 
 
 echo "## Targets are mounted under \`\`\`/var/lib/bareos\`\`\` and available on:
-Backup Volume:		$BACKUP_VOL
-Backup Target:		$BACKUP_TGT
-Storage Target:		$SD_TGT
-Bootstrap Target:	$BOOTSTRAP_TGT
+Backup Volume:      |$BACKUP_VOL
+Backup Target:      |$BACKUP_TGT
+Storage Target:     |$SD_TGT
+Bootstrap Target:   |$BOOTSTRAP_TGT
 " >> $CONFIG_DOC
 
 
