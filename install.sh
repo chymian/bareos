@@ -57,10 +57,11 @@ BAROS_USER="bareos"
 BAROS_BASE_DIR="/etc/bareos"
 BAREOSDIR_DIR="$BAROS_BASE_DIR/bareos-dir.d"
 
-PREREQ="pwgen uuid-runtime git make"
+PREREQ="pwgen uuid-runtime git make mailutils"
 agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
 agu='apt-get update'
 DEBIAN_FRONTEND=noninteractive
+MAIL_PROG=/usr/bin/mail.mailutils
 
 usage() {
 # Switches not implemented yes
@@ -87,11 +88,11 @@ main() {
 install_prereq() {
 echo "# BareOS Backup Server
 
-Installation on:|$SERVER
-Date:           |`date`
-BarOS Version:  |16.2
+Installation on: $SERVER
+Date:            `date`
+BarOS Version:   16.2
 
-" >> $CONFIG_DOC
+" > $CONFIG_DOC
 
 	# add repo for webUI
 	URL=http://download.bareos.org/bareos/$WEBUI_RELEASE/$WEBUI_DIST
@@ -104,6 +105,8 @@ BarOS Version:  |16.2
 	# install Bareos packages
 	$agu  >/dev/null 2>&1
 	$agi $PREREQ
+	# needed to send attached Files
+	update-alternatives --set mailx /usr/bin/mail.mailutils
 
 	# check for backupTarget
 	[ -w $BACKUP_VOL ] || {
@@ -135,10 +138,10 @@ BarOS Version:  |16.2
 
 
 echo "## Targets are mounted under \`\`\`/var/lib/bareos\`\`\` and available on:
-Backup Volume:      |$BACKUP_VOL
-Backup Target:      |$BACKUP_TGT
-Storage Target:     |$SD_TGT
-Bootstrap Target:   |$BOOTSTRAP_TGT
+Backup Volume:       $BACKUP_VOL
+Backup Target:       $BACKUP_TGT
+Storage Target:      $SD_TGT
+Bootstrap Target:    $BOOTSTRAP_TGT
 " >> $CONFIG_DOC
 
 
@@ -245,7 +248,8 @@ configure_base() {
 		sed -i "s/\}/  FileSet = LinuxHC\n  \}/g" $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
 	fi
 
-echo "## BareOS Services Passwords"
+echo "## BareOS Services Passwords
+"
 for i in DIRECTOR CLIENT STORAGE ; do
 	printf "${i}_PASSWORD:\t\t$(grep ${i}_PASSWORD $BAREOS_BASE_DIR/.rndpwd|cut -d"=" -f2)\n" >> $CONFIG_DOC
 done
@@ -255,14 +259,15 @@ for i in DIRECTOR_MONITOR CLIENT_MONITOR STORAGE_MONITOR; do
 
 done
 
-echo "## End of Server-Installation
+echo "
+## End of Server-Installation
+
 Succesfully installed:
 Server:     $(hostname)
 OS:         $(lsb_release -d)
 BareOS:     $(apt-cache show policy bareos|grep Version)
 PostgreSQL: $(apt-cache show policy postgresql|grep Version)
 
-#####################################################################################
 " >> $CONFIG_DOC
 
 
