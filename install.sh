@@ -57,7 +57,7 @@ BAROS_USER="bareos"
 BAROS_BASE_DIR="/etc/bareos"
 BAREOSDIR_DIR="$BAROS_BASE_DIR/bareos-dir.d"
 
-PREREQ="pwgen uuid-runtime git make mailutils"
+PREREQ="pwgen uuid-runtime git make mailutils pandoc"
 agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
 agu='apt-get update'
 DEBIAN_FRONTEND=noninteractive
@@ -88,7 +88,8 @@ main() {
 install_prereq() {
 echo "# BareOS Backup Server
 
-Installation on: $SERVER
+## Installationprotocol
+on:               $SERVER
 Date:            `date`
 BarOS Version:   16.2
 
@@ -268,6 +269,8 @@ OS:         $(lsb_release -d)
 BareOS:     $(apt-cache show policy bareos|grep Version)
 PostgreSQL: $(apt-cache show policy postgresql|grep Version)
 
+This Page is also availlable on: [http://$SERVER:81/bareos-doc](http://$SERVER:81/bareos-doc/)
+
 " >> $CONFIG_DOC
 
 
@@ -296,7 +299,8 @@ reload_director(){
 
 finish_docu() {
 	cp $CONFIG_DOC /root
-	cat $CONFIG_DOC | mailx -s "BareOS Configuration" root
+	pandoc -f markdown_github  -t plain ${CONFIG_DOC} |mailx -s "Backupserver BareOS Installation Doku" -A ${CONFIG_DOC}  root
+	pandoc --ascii -f markdown_github  -t html ${CONFIG_DOC} >/var/www/html/$(basename $CONFIG_DOC .md).html
 }
 
 # Main
