@@ -96,12 +96,13 @@ EOF
 
 echo "
 ## Client added
-Hostname/IP:|$1
-JobDef:     |$2
-Fileset:    |$3
+Hostname/IP: $1
+JobDef:      $2
+Fileset:     $3
 "
 } # client_job
 
 mail_doc() {
-	cat $CONFIG_DOC | mailx -s "BareOS Configuration" root
+	pandoc -f markdown_github  -t plain ${CONFIG_DOC} |mailx -s "Backupserver BareOS Installation Doku" -A ${CONFIG_DOC}  root
+	pandoc --ascii -f markdown_github  -t html ${CONFIG_DOC} >/var/www/html/$(basename $CONFIG_DOC .md).html
 } # mail_doc
