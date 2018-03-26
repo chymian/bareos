@@ -62,19 +62,37 @@ agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --
 agu='apt-get update'
 DEBIAN_FRONTEND=noninteractive
 
+usage() {
+# Switches not implemented yes
+	echo "$0 usage [options]
+
+Options:
+  -m <email>      eMail-Addr to send installation report to
+  -a <name>       WebUI Admin Name
+  -w <password>   WebUI Admin Password
+  -c <name>       Setup Client Job (only), no Installation of BareOS-Server
+"
+} # usage
+
 main() {
+
 	install_prereq
 	install_base
 	restart_daemons
 	install_webui
 	configure_base
+	finish_docu
 } # main
 
 install_prereq() {
 echo "#####################################################################################
 
-# Starting Installation
-Datum:	`date`
+# BareOS Backup Server
+
+Installation on: $SERVER
+Date:           `date`
+BarOS Version:  16.2
+
 " >> $CONFIG_DOC
 
 	# add repo for webUI
@@ -165,10 +183,10 @@ install_base() {
 	[ -f bareos-sd.conf.dist  ] && mv bareos-sd.conf.dist .bareos-sd.conf.dist
 	find . -type f -exec chmod 644 {} \;
 
-	echo "## Database Passwords
-PostgreSQL Admin:	$PGSQL_ADMIN_PW
-BareOS DB:		$PGSQL_BAREOSDB_PW
-" >> $CONFIG_DOC
+	#echo "## Database Passwords
+#PostgreSQL Admin:	$PGSQL_ADMIN_PW
+#BareOS DB:		$PGSQL_BAREOSDB_PW
+#" >> $CONFIG_DOC
 
 
 } # install_base
@@ -191,13 +209,13 @@ install_webui() {
 	echo "configure add console name=$WEBUI_ADM password=$WEBUI_PW profile=webui-admin"|bconsole
 	reload_director
 
-	echo "
-## Webinterface
+	echo "## Webinterface
 Link: [http://$SERVER:81/bareos-webui/](http://$SERVER:81/bareos-webui/)
 
 WebUI User:     $WEBUI_ADM
 WebUI Password: $WEBUI_PW
-	" >> $CONFIG_DOC
+" >> $CONFIG_DOC
+
 } # install_webui
 
 
@@ -221,13 +239,35 @@ configure_base() {
 	else
 		sed -i "s/Level/Client = $SERVER-fd\n  Level/g" $BAREOSDIR_DIR/job/BackupCatalog.conf
 	fi
-	# make sure, fileset ist set in Job "backup-$SERVER-fd" 
+	# make sure, fileset ist set in Job "backup-$SERVER-fd"
 	mv $BAREOSDIR_DIR/job/backup-bareos-fd.conf $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
 	if [ `grep -ci fileset $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf` = 1 ] ; then
 		sed -i "s/.ile.et.*/FileSet = LinuxHC/g" $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
 	else
 		sed -i "s/\}/  FileSet = LinuxHC\n  \}/g" $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
 	fi
+
+echo "## BareOS Services Passwords"
+for i in DIRECTOR CLIENT STORAGE ; do
+	printf "${i}_PASSWORD:\t\t$(grep ${i}_PASSWORD $BAREOS_BASE_DIR/.rndpwd|cut -d"=" -f2)\n" >> $CONFIG_DOC
+done
+
+for i in DIRECTOR_MONITOR CLIENT_MONITOR STORAGE_MONITOR; do
+	printf "${i}_PASSWORD:\t$(grep ${i}_PASSWORD $BAREOS_BASE_DIR/.rndpwd|cut -d"=" -f2)\n" >> $CONFIG_DOC
+
+done
+
+echo "## End of Server-Installation
+Succesfully installed:
+Server:     $(hostname)
+OS:         $(lsb_release -d)
+BareOS:     $(apt-cache show policy bareos|grep Version)
+PostgreSQL: $(apt-cache show policy postgresql|grep Version)
+
+#####################################################################################
+" >> $CONFIG_DOC
+
+
 
 } # configure_base
 
@@ -241,15 +281,20 @@ configure_base() {
 
 
 restart_daemons() {
-	chown -R $BAROS_USER. $BAROS_BASE_DIR
+	w -R $BAROS_USER. $BAROS_BASE_DIR
 	service bareos-dir restart
 	service bareos-fd restart
-	service bareos-sd restart
+	ervice bareos-sd restart
 } #restart_daemons
 
 reload_director(){
 	echo reload | bconsole
 } #reload_director
+
+finish_docu() {
+	cp $CONFIG_DOC /root
+	cat $CONFIG_DOC | mailx -s "BareOS Configuration" root
+}
 
 # Main
 main
