@@ -89,9 +89,11 @@ install_prereq() {
 echo "# BareOS Backup Server
 
 ## Installationprotocol
-on:               $SERVER
+```
+on:              $SERVER
 Date:            `date`
 BarOS Version:   16.2
+```
 
 " > $CONFIG_DOC
 
@@ -139,10 +141,12 @@ BarOS Version:   16.2
 
 
 echo "## Targets are mounted under \`\`\`/var/lib/bareos\`\`\` and available on:
+```
 Backup Volume:       $BACKUP_VOL
 Backup Target:       $BACKUP_TGT
 Storage Target:      $SD_TGT
 Bootstrap Target:    $BOOTSTRAP_TGT
+```
 " >> $CONFIG_DOC
 
 
@@ -214,8 +218,10 @@ install_webui() {
 	echo "## Webinterface
 Link: [http://$SERVER:81/bareos-webui/](http://$SERVER:81/bareos-webui/)
 
+```
 WebUI User:     $WEBUI_ADM
 WebUI Password: $WEBUI_PW
+```
 " >> $CONFIG_DOC
 
 } # install_webui
@@ -264,10 +270,12 @@ echo "
 ## End of Server-Installation
 
 Succesfully installed:
+```
 Server:     $(hostname)
 OS:         $(lsb_release -d)
 BareOS:     $(apt-cache show policy bareos|grep Version)
 PostgreSQL: $(apt-cache show policy postgresql|grep Version)
+```
 
 This Page is also availlable on: [http://$SERVER:81/bareos-doc](http://$SERVER:81/bareos-doc/)
 
