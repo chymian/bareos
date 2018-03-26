@@ -17,6 +17,7 @@ fi
 
 echo setting hostname to $HOSTNAME
 echo $HOSTNAME > /etc/hostname
+echo $HOSTNAME > /etc/mailname
 /bin/hostname -F /etc/hostname
 
 cat <<EOF > /etc/hosts

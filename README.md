@@ -205,7 +205,7 @@ Exclude {
 }
 ```
 #### The clever FileSet
-```File = "\\|/bin/bash -c …" ``` runs on the client
+**File = "\\|/bin/bash -c …"** runs on the client
 
 ```
 # standard filessystems
