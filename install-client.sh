@@ -151,7 +151,8 @@ main() {
 
 client_job() {
 	bconsole << EOF
-configure add job
+configure add job \
+  Enabled="yes" \
   Client="${1}-fd" \
   Name="backup-${1}-fd" \
   JobDefs="${2}" \
