@@ -39,11 +39,11 @@ BAREOSDIR_DIR="$BAREOS_BASE_DIR/bareos-dir.d"
 PREREQ="pwgen uuid-runtime git make"
 agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
 agu='apt-get update'
-DEBIAN_FRONTEND=noninteractive
-mail=/usr/bin/mail.mailutils
-HTML_TGT=/var/www/html
-CFG_TAR=bareos-etc.tar.gz
-FINISH_DOCU=`false`
+DEBIAN_FRONTEND="noninteractive"
+mail="/usr/bin/mail.mailutils"
+HTML_TGT="/var/www/html"
+CFG_TAR="bareos-etc.tar.gz"
+FINISH_DOCU="no"
 
 usage() {
 	echo "usage: $(basename$0): [-j <jobdef> -f <fileset>] <clientname>
@@ -87,7 +87,7 @@ main() {
 			shift
 			;;
 		-m)
-			FINISH_DOCU=`true`
+			FINISH_DOCU=yes
 			shift
 			;;
 		-h)
@@ -100,7 +100,7 @@ main() {
 			;;
 	esac
 
-	$FINISH_DOCU && finish_docu
+	if [ $FINISH_DOCU = "yes" ] && finish_docu
 } #main
 
 client_job() {
@@ -108,7 +108,7 @@ client_job() {
 configure add job
   Enabled="yes" \
   Client="${1}-fd" \
-  Name="backup-$CLIENT-fd" \
+  Name="backup-${1}-fd" \
   JobDefs="${2}" \
   FileSet="${3}" \
   Description="Standard hourly Backup"
