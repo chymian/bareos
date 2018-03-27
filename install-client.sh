@@ -92,36 +92,42 @@ list_defs() {
 
 main() {
 	while true; do
-		case $1 in
+		case "$1" in
 			'-j')
 				JOBSET=$2
-				shift; shift
+				echo "Option -j, Arg: '$2'"
+				shift 2
 				continue
 				;;
 			'-f')
 				FILESET=$2
-				shift; shift
+				echo "Option -f, Arg: '$2'"
+				shift 2
 				continue
 				;;
 			'-l')
 				list_defs
+				echo "Option -l"
 				shift
 				break
 				;;
 			'-m')
 				FINISH_DOCU=yes
+				echo "Option -m"
 				shift
 				continue
 				;;
 			'-h')
+				echo "Option -h"
 				usage
 				break
 				;;
 			*)
 				CLIENT=$1
+				echo "Option keine , Arg: '$1'"
 				shift
 				client_job ${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
-				continue
+				break
 				;;
 		esac
 	done
