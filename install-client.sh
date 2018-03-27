@@ -45,7 +45,22 @@ HTML_TGT="/var/www/html"
 CFG_TAR="bareos-etc.tar.gz"
 FINISH_DOCU="no"
 
-Called with Paramters: $*
+echo Called with Paramters: $*
+# Note that we use "$@" to let each command-line parameter expand to a
+# separate word. The quotes around "$@" are essential!
+# We need TEMP as the 'eval set --' would nuke the return value of getopt.
+TEMP=$(getopt -o 'mlhj:f:' -- "$@")
+
+if [ $? -ne 0 ]; then
+	echo 'Terminating...' >&2
+	usage
+		exit 1
+fi
+
+# Note the quotes around "$TEMP": they are essential!
+eval set -- "$TEMP"
+unset TEMP
+
 
 usage() {
 	echo "usage: $(basename$0): [-j <jobdef> -f <fileset>] <clientname>
@@ -74,33 +89,42 @@ list_defs() {
 
 } # list_defs
 
+
 main() {
-	case $1 in
-		-j)
-			JOBSET=$2
-			shift; shift
-			;;
-		-f)
-			FILESET=$2
-			shift; shift
-			;;
-		-l)
-			list_defs
-			shift
-			;;
-		-m)
-			FINISH_DOCU=yes
-			shift
-			;;
-		-h)
-			usage
-			;;
-		???*)
-			CLIENT=$1
-			shift
-			client_job ${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
-			;;
-	esac
+	while true; do
+		case $1 in
+			'-j')
+				JOBSET=$2
+				shift; shift
+				continue
+				;;
+			'-f')
+				FILESET=$2
+				shift; shift
+				continue
+				;;
+			'-l')
+				list_defs
+				shift
+				break
+				;;
+			'-m')
+				FINISH_DOCU=yes
+				shift
+				continue
+				;;
+			'-h')
+				usage
+				break
+				;;
+			*)
+				CLIENT=$1
+				shift
+				client_job ${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
+				break
+				;;
+		esac
+	done
 
 	[ $FINISH_DOCU = "yes" ] && finish_docu
 } #main
