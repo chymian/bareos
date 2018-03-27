@@ -129,20 +129,23 @@ main() {
 				;;
 			*)
 				CLIENT=$1
-				echo "Option -c , Arg: '$1'"
-				client_job "$1" ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
+				echo "Option -c , Arg: '$1', Clientname: $CLIENT"
+				echo "calling client_job with:" "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
+				client_job "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
 				shift
 				break
 				;;
-			#*)
-				#echo "Internal:Last CMD"
-				#usage
-				#exit 1
-				#;;
 		esac
 	done
 
-	[ $FINISH_DOCU = "yes" ] && finish_docu
+	[ $FINISH_DOCU = "yes" ] && {
+		finish_docu
+		exit 0
+	}
+
+	[ $CLIENT = "" ] && {
+		echo "clientname missing, Aborting…" >&2
+		exit 2
 } #main
 
 client_job() {
