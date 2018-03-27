@@ -125,7 +125,7 @@ main() {
 				;;
 			'--')
 				shift
-				break
+				continue
 				;;
 			*)
 				CLIENT=$1
