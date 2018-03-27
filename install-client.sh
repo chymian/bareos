@@ -65,9 +65,9 @@ exit 0
 
 main() {
 	if [ $# = 0 ]; then
-		echo "existing JobDefs:  $(ls -1 $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"/" -f6)"|xargs
+		echo "existing JobDefs:  $(grep -i Name $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"=" -f2|sort -u|xargs)
 		echo
-		echo "existing FileSets: $(ls -1 $BAREOSDIR_DIR/fileset/*.conf|cut -d"/" -f6)"|xargs
+		echo "existing FileSets: $(grep -i Name $BAREOSDIR_DIR/fileset/*.conf|cut -d"=" -f2|sort -u|xargs)
 		exit 0
 	else
 		case $1 in
