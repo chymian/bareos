@@ -46,7 +46,7 @@ CFG_TAR=bareos-etc.tar.gz
 FINISH_DOCU=`false`
 
 usage() {
-	echo "usage: $0: [-j <jobdef> -f <fileset>] <clientname>
+	echo "usage: $(basename$0): [-j <jobdef> -f <fileset>] <clientname>
 Setup a Job for client with the defaults JobDef: $DEFAULT_JOB and FileSet: $DEFAULT_FILESET.
 clientname can be a resolvable Hostname or an IP-Address.
 
@@ -65,7 +65,6 @@ exit 0
 
 main() {
 	if [ $# = 0 ]; then
-		usage
 		echo "existing JobDefs:  $(ls -1 $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"/" -f6)|xargs"
 		echo "existing FileSets: $(ls -1 $BAREOSDIR_DIR/fileset/*.conf|cut -d"/" -f6)|xargs"
 		exit 0
