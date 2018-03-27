@@ -134,11 +134,11 @@ main() {
 				shift
 				break
 				;;
-			*)
-				echo "Internal:Last CMD"
-				usage
-				exit 1
-				;;
+			#*)
+				#echo "Internal:Last CMD"
+				#usage
+				#exit 1
+				#;;
 		esac
 	done
 
