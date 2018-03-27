@@ -43,7 +43,7 @@ DEBIAN_FRONTEND=noninteractive
 mail=/usr/bin/mail.mailutils
 HTML_TGT=/var/www/html
 CFG_TAR=bareos-etc.tar.gz
-
+FINISH_DOCU=`false`
 
 usage() {
 	echo "usage: $0: [-d <jobdef> -f <fileset>] <clientname>
@@ -53,14 +53,16 @@ clientname can be a resolvable Hostname or an IP-Address.
    -j  Use Jobdef <name> instaed of Default JobDef
    -f  Use FileSet <name> instaed of Default FileSet
    -m  Mail the Config-Docu & update html-page
-   Without Parameters, all existing JobDefs and FileSets will be listed.
+
+Without Parameters, all existing JobDefs and FileSets will be listed.
+Docu & backup-Tarball are not automatically updated. Use \"-m\" on last client or by it's own at the end of your Setups.
 "
 } # usage
 
 main() {
 	if [ $# = 0 ]; then
 		usage
-		echo "existing JobDefs:  $(ls -1 $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"/" -f6|xargs)"
+		echo "existing JobDefs:  $(ls -1 $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"/" -f6)"
 		echo "existing FileSets: $(ls -1 $BAREOSDIR_DIR/fileset/*.conf|cut -d"/" -f6)"
 	else
 		case $1 in
@@ -73,7 +75,7 @@ main() {
 				shift; shift
 				;;
 			-m)
-				FINISH_DOCU=true
+				FINISH_DOCU=`true`
 				shift
 				;;
 			*)
@@ -106,6 +108,8 @@ JobDef:      $2
 Fileset:     $3
 \`\`\`
 " >> $CONFIG_DOC
+
+
 } # client_job
 
 finish_docu() {
