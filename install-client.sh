@@ -60,7 +60,6 @@ Docu & config-Tarball are not automatically updated.
 Use \"-m\" on last client or by it's own at the end of your Setups.
 
 "
-exit 0
 } # usage
 
 main() {
