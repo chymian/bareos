@@ -67,6 +67,7 @@ main() {
 	if [ $# = 0 ]; then
 		echo "existing JobDefs:"
 		echo "$(grep -i Name $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"=" -f2|sort -u)"
+		echo
 		echo "existing FileSets:"
 		echo "$(grep -i Name $BAREOSDIR_DIR/fileset/*.conf|cut -d"=" -f2|sort -u)"
 		exit 0
