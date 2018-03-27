@@ -165,8 +165,7 @@ echo "
 ## ClientJob added
 \`\`\`
 Hostname/IP: $1
-JobDef:      $2
-Fileset:     $3
+ClientPW     $2
 \`\`\`
 " >> $CONFIG_DOC
 
