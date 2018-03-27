@@ -6,7 +6,7 @@ At the time of writing, it's OMV Arrakis 4.0 on Debian 9 Stretch.
 
 ## Prerequisites
 Create a Backup-Volume/Partiton on the RAID/Disk with label **backup**.  
-The Volume with the Subvolume bareos will be mounted on ```/var/lib/bareos/``` to hold all BareOS relevant data-files.
+The Volume with the Subvolume bareos will be mounted on `/var/lib/bareos/` to hold all BareOS relevant data-files.
 ```
 BACKUP_VOL=/srv/dev-disk-by-label-backup
 btrfs sub cr $BACKUP_VOL/bareos
@@ -95,7 +95,7 @@ EOF
 
 ## Configuring BareOS
 ### Correcting Debian default configs  
-Changing the default Client-/Director-/Monitor-Name from "bareos" to [Server-hostname]-dir|sd|fd
+Changing the default Client-/Director-/Monitor-Name from `bareos` to `[Server-hostname]-dir|sd|fd`
 ```
 SERVER=`hostname`
 cd /etc/baros
@@ -108,7 +108,7 @@ for i in `grep bareos-sd -lr * `; do sed -i s/bareos-sd/$SERVER-sd/g $i; done
 ### Pool Definitions
 
 #### Volume Retention
-in ```/etc/bareos/bareos-dir.d/pool/```
+in `/etc/bareos/bareos-dir.d/pool/`
 
 * Full 4(2) months
 * Differencial 2(1) months
@@ -144,7 +144,7 @@ EOF
 <div class="page-break"></div>
 
 ### Schedule  
-in ```/etc/bareos/bareos-dir.d/schedule/```
+in `/etc/bareos/bareos-dir.d/schedule/`
 
 #### WeeklyCycle Schedule
 * defaults to 21:00
@@ -179,7 +179,7 @@ EOF
 ```
 
 ### Fileset
-in ```/etc/bareos/bareos-dir.d/fileset/```  
+in `/etc/bareos/bareos-dir.d/fileset/`  
 **HINT:**  LZ4(HC)-Compression is supported from 16.2 @stretch – onwards.
 Use GZIP with 14.2 – jessie (Debian 8) and Ubuntu 16.04
 ```
@@ -205,7 +205,7 @@ Exclude {
 }
 ```
 #### The clever FileSet
-**File = "\\|/bin/bash -c …"** runs on the client
+* Run a FileList-CMD on the on the client: `File = "\\|/bin/bash -c …"`
 
 ```
 # standard filessystems
@@ -243,7 +243,7 @@ File = /var/lib/lxc/coiner/rootfs
 * Create Hourly-JobDef
 * Create LongTerm-JobDef
 * Accurate = yes
-* Write Bootstrap = "/var/lib/bareos/**bootstrap**/%c.bsr"
+* Write Bootstrap = `/var/lib/bareos/**bootstrap**/%c.bsr`
 ```
 sed -i s#/var/lib/bareos/\%c#/var/lib/bareos/bootstrap/\%c#g \
   /etc/bareos/bareos-dir.d/jobdefs/*
@@ -417,7 +417,7 @@ see [FileSet Definitions](http://doc.bareos.org/master/html/bareos-manual-main-r
 either use (raw) image-backup @HOST or use  
 
 ##### Client initiated Connections for NotAlwaysOn VPS/LXCs
-in **/etc/bareos/bareos-dir.d/clients/** or per bconsole add to the usual client cmd:
+in `/etc/bareos/bareos-dir.d/clients/` or per bconsole add to the usual client cmd:
 
 ```
 Name = <client>-fd
