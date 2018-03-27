@@ -63,7 +63,7 @@ unset TEMP
 
 
 usage() {
-	echo "usage: $(basename $0): [-j <jobdef> -f <fileset>]  <clientname>
+	echo "usage: $(basename $0) [-j <jobdef> -f <fileset>]  <clientname>
 Setup a Job for client with the defaults JobDef: $DEFAULT_JOB and FileSet: $DEFAULT_FILESET.
 clientname can be a resolvable Hostname or an IP-Address.
 
@@ -91,7 +91,7 @@ list_defs() {
 
 
 main() {
-	echo "main called with: $@"
+	echo "main called with:" "$@"
 	while true; do
 		case "$1" in
 			'-j')
