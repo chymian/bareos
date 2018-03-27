@@ -121,7 +121,7 @@ main() {
 				CLIENT=$1
 				shift
 				client_job ${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
-				break
+				continue
 				;;
 		esac
 	done
