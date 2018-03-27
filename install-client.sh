@@ -60,8 +60,8 @@ clientname can be a resolvable Hostname or an IP-Address.
 main() {
 	if [ $# = 0 ]; then
 		usage
-		echo "\nexisting JobDefs:  $(ls -1 $BAREOS_DIR_DIR/jobdefs/*.conf|cut -d"/" -f6|xargs)"
-		echo "\nexisting FileSets: $(ls -1 $BAREOS_DIR_DIR/fileset/*.conf|cut -d"/" -f6)"
+		echo "\nexisting JobDefs:  $(ls -1 $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"/" -f6|xargs)"
+		echo "\nexisting FileSets: $(ls -1 $BAREOSDIR_DIR/fileset/*.conf|cut -d"/" -f6)"
 	else
 		case $1 in
 			-j)

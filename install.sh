@@ -274,14 +274,15 @@ echo "## End of Server-Installation
 Succesfully installed:
 \`\`\`
 Server:     ${SERVER}
-OS:         $(lsb_release -d|awk '{print $2}')
+OS:         $(lsb_release -d|awk '{print $2,$3,$4,%5}')
 BareOS:     $(apt-cache show policy bareos|grep Version|awk '{print $2}')
 PostgreSQL: $(apt-cache show policy postgresql|grep Version|awk '{print $2}')
 \`\`\`
 A tarball of the configuration Directory \'$BAREOS_BASE_DIR\' is available at [http://$SERVER:81/$CFG_TAR](http://$SERVER:81/$CFG_TAR)
-
+---
 This Page is also availlable on: [http://$SERVER:81/$(basename $CONFIG_DOC .md).html](http://$SERVER:81/$(basename $CONFIG_DOC .md).html)
 
+***
 " >> $CONFIG_DOC
 
 
