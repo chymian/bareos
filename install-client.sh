@@ -100,7 +100,7 @@ main() {
 			;;
 	esac
 
-	if [ $FINISH_DOCU = "yes" ] && finish_docu
+	[ $FINISH_DOCU = "yes" ] && finish_docu
 } #main
 
 client_job() {
