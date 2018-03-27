@@ -107,8 +107,8 @@ main() {
 				continue
 				;;
 			'-l')
-				list_defs
 				echo "Option -l"
+				list_defs
 				shift
 				break
 				;;
@@ -130,7 +130,7 @@ main() {
 			*)
 				CLIENT=$1
 				echo "Option -c , Arg: '$1', Clientname: $CLIENT"
-				echo "calling client_job with:" "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
+				echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
 				client_job "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
 				shift
 				break
@@ -146,6 +146,7 @@ main() {
 	[ $CLIENT = "" ] && {
 		echo "clientname missing, Aborting…" >&2
 		exit 2
+	}
 } #main
 
 client_job() {
