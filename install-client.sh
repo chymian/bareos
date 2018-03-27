@@ -45,6 +45,8 @@ HTML_TGT="/var/www/html"
 CFG_TAR="bareos-etc.tar.gz"
 FINISH_DOCU="no"
 
+Called with Paramters: $*
+
 usage() {
 	echo "usage: $(basename$0): [-j <jobdef> -f <fileset>] <clientname>
 Setup a Job for client with the defaults JobDef: $DEFAULT_JOB and FileSet: $DEFAULT_FILESET.
