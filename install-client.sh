@@ -63,11 +63,10 @@ unset TEMP
 
 
 usage() {
-	echo "usage: $(basename$0): [-j <jobdef> -f <fileset>] -c <clientname>
+	echo "usage: $(basename$0): [-j <jobdef> -f <fileset>]  <clientname>
 Setup a Job for client with the defaults JobDef: $DEFAULT_JOB and FileSet: $DEFAULT_FILESET.
 clientname can be a resolvable Hostname or an IP-Address.
 
-   -c <client>  Create a Job for <client>
    -f <fileset> Use FileSet <fileset> instaed of Default FileSet
    -h           Show this message.
    -j <jobdef>  Use Jobdef <jobdef> instaed of Default JobDef
@@ -124,14 +123,14 @@ main() {
 				usage
 				exit 1
 				;;
-			'-c')
-				CLIENT=$2
-				echo "Option -c , Arg: '$2'"
-				client_job "$2" ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
+			'--')
 				shift
 				break
 				;;
-			'--')
+			*)
+				CLIENT=$1
+				echo "Option -c , Arg: '$1'"
+				client_job "$1" ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
 				shift
 				break
 				;;
