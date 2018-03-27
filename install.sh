@@ -279,7 +279,7 @@ PostgreSQL: $(apt-cache show policy postgresql|grep Version|awk '{print $2}')
 \`\`\`
 A tarball of the configuration Directory \'$BAREOS_BASE_DIR\' is available at [http://$SERVER:81/$CFG_TAR](http://$SERVER:81/$CFG_TAR)
 
-This Page is also availlable on: [http://$SERVER:81/bareos-doc.html](http://$SERVER:81/bareos-doc.html)
+This Page is also availlable on: [http://$SERVER:81/$(basename $CONFIG_DOC .md).html](http://$SERVER:81/$(basename $CONFIG_DOC .md).html)
 
 " >> $CONFIG_DOC
 
