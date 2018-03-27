@@ -130,6 +130,8 @@ main() {
 			*)
 				CLIENT=$1
 				echo "Option -c , Arg: '$1', Clientname: $CLIENT"
+				echo "calling client_add with: " "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}"
+				client_add "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}"
 				echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
 				client_job "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
 				shift
@@ -149,6 +151,27 @@ main() {
 	}
 } #main
 
+client_add() {
+	bconsole << EOF
+configure add client \
+  name=$1-fd \
+  address=$1 \
+  password=$2 \
+  AutoPrune=yes
+reload
+EOF
+
+echo "
+## ClientJob added
+\`\`\`
+Hostname/IP: $1
+JobDef:      $2
+Fileset:     $3
+\`\`\`
+" >> $CONFIG_DOC
+
+} # client_add
+
 client_job() {
 	bconsole << EOF
 configure add job \
@@ -162,7 +185,7 @@ reload
 EOF
 
 echo "
-## Client added
+## ClientJob added
 \`\`\`
 Hostname/IP: $1
 JobDef:      $2
