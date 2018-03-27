@@ -92,6 +92,7 @@ list_defs() {
 
 
 main() {
+	echo "main called with: $@"
 	while true; do
 		case "$1" in
 			'-j')
@@ -127,6 +128,10 @@ main() {
 				CLIENT=$2
 				echo "Option -c , Arg: '$2'"
 				client_job "$2" ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
+				shift
+				break
+				;;
+			'--')
 				shift
 				break
 				;;
