@@ -60,8 +60,8 @@ clientname can be a resolvable Hostname or an IP-Address.
 main() {
 	if [ $# = 0 ]; then
 		usage
-		echo "\nexisting JobDefs:  $(ls -1 $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"/" -f6|xargs)"
-		echo "\nexisting FileSets: $(ls -1 $BAREOSDIR_DIR/fileset/*.conf|cut -d"/" -f6)"
+		echo "existing JobDefs:  $(ls -1 $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"/" -f6|xargs)"
+		echo "existing FileSets: $(ls -1 $BAREOSDIR_DIR/fileset/*.conf|cut -d"/" -f6)"
 	else
 		case $1 in
 			-j)
@@ -115,7 +115,7 @@ finish_docu() {
 	cp $WORK_DIR/$CFG_TAR /root
 	cd $WORK_DIR
 	cp $CONFIG_DOC /root
-	pandoc -f markdown_github -t plain ${CONFIG_DOC} |$mail_prg -s "Backupserver BareOS Installation Report" -A ${CONFIG_DOC} -A $WORK_DIR/$CFG_TAR root
+	pandoc -f markdown_github -t plain ${CONFIG_DOC} |$mail -s "Backupserver BareOS Installation Report" -A ${CONFIG_DOC} -A $WORK_DIR/$CFG_TAR root
 	pandoc --ascii -f markdown_github -t html ${CONFIG_DOC} > $HTML_TGT/$(basename $CONFIG_DOC .md).html
 } # finish_docu
 
