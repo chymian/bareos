@@ -46,24 +46,28 @@ CFG_TAR=bareos-etc.tar.gz
 FINISH_DOCU=`false`
 
 usage() {
-	echo "usage: $0: [-d <jobdef> -f <fileset>] <clientname>
+	echo "usage: $0: [-j <jobdef> -f <fileset>] <clientname>
 Setup a Job for client with the defaults JobDef: $DEFAULT_JOB and FileSet: $DEFAULT_FILESET.
 clientname can be a resolvable Hostname or an IP-Address.
 
-   -j  Use Jobdef <name> instaed of Default JobDef
-   -f  Use FileSet <name> instaed of Default FileSet
-   -m  Mail the Config-Docu & update html-page
+   -f <fileset> Use FileSet <fileset> instaed of Default FileSet
+   -h           Show this message.
+   -j <jobdef>  Use Jobdef <jobdef> instaed of Default JobDef
+   -m           Mail the updated Config-Docu and config-tarball
 
 Without Parameters, all existing JobDefs and FileSets will be listed.
-Docu & backup-Tarball are not automatically updated. Use \"-m\" on last client or by it's own at the end of your Setups.
+Docu & config-Tarball are not automatically updated.
+Use \"-m\" on last client or by it's own at the end of your Setups.
+
 "
+exit 0
 } # usage
 
 main() {
 	if [ $# = 0 ]; then
 		usage
-		echo "existing JobDefs:  $(ls -1 $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"/" -f6)"
-		echo "existing FileSets: $(ls -1 $BAREOSDIR_DIR/fileset/*.conf|cut -d"/" -f6)"
+		echo "existing JobDefs:  $(ls -1 $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"/" -f6)|xargs"
+		echo "existing FileSets: $(ls -1 $BAREOSDIR_DIR/fileset/*.conf|cut -d"/" -f6)|xargs"
 	else
 		case $1 in
 			-j)
@@ -77,6 +81,9 @@ main() {
 			-m)
 				FINISH_DOCU=`true`
 				shift
+				;;
+			-h)
+				usage
 				;;
 			*)
 				CLIENT=$1
