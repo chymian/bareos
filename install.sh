@@ -289,7 +289,7 @@ This Page is also availlable on: [http://$SERVER:81/bareos-doc.html](http://$SER
 
 
 restart_daemons() {
-	chown -R $BAREOS_USER. $BAREOS_BASE_DIR
+	chown -R $BAREOS_USER. $BAREOS_BASE_DIR /var/lib/bareos/
 	service bareos-dir restart
 	service bareos-fd restart
 	service bareos-sd restart
