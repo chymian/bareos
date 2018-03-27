@@ -53,15 +53,15 @@ GIT_REPO_NAME="bareos"
 GIT_REPO="https://github.com/chymian/$GIT_REPO_NAME"
 
 # miscellanious
-BAROS_USER="bareos"
-BAROS_BASE_DIR="/etc/bareos"
+BAREOS_USER="bareos"
+BAREOS_BASE_DIR="/etc/bareos"
 BAREOSDIR_DIR="$BAROS_BASE_DIR/bareos-dir.d"
 
 PREREQ="pwgen uuid-runtime git make mailutils pandoc"
 agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
 agu='apt-get update'
 DEBIAN_FRONTEND=noninteractive
-mail_prog=/usr/bin/mail.mailutils
+mail=/usr/bin/mail.mailutils
 HTML_TGT=/var/www/html
 CFG_TAR=bareos-etc.tar.gz
 
@@ -91,11 +91,11 @@ install_prereq() {
 echo "# BareOS Backup Server
 
 ## Installationprotocol
-```
+\`\`\`
 on:              $SERVER
 Date:            `date`
 BarOS Version:   16.2
-```
+\`\`\`
 
 " > $CONFIG_DOC
 
@@ -143,12 +143,12 @@ BarOS Version:   16.2
 
 
 echo "## Targets are mounted under \`\`\`/var/lib/bareos\`\`\` and available on:
-```
+\`\`\`
 Backup Volume:       $BACKUP_VOL
 Backup Target:       $BACKUP_TGT
 Storage Target:      $SD_TGT
 Bootstrap Target:    $BOOTSTRAP_TGT
-```
+\`\`\`
 " >> $CONFIG_DOC
 
 
@@ -220,10 +220,10 @@ install_webui() {
 	echo "## Webinterface
 Link: [http://$SERVER:81/bareos-webui/](http://$SERVER:81/bareos-webui/)
 
-```
+\`\`\`
 WebUI User:     $WEBUI_ADM
 WebUI Password: $WEBUI_PW
-```
+\`\`\`
 " >> $CONFIG_DOC
 
 } # install_webui
@@ -272,12 +272,12 @@ echo "
 ## End of Server-Installation
 
 Succesfully installed:
-```
-Server:     $(hostname)
+\`\`\`
+Server:     ${SERVER}
 OS:         $(lsb_release -d)
 BareOS:     $(apt-cache show policy bareos|grep Version)
 PostgreSQL: $(apt-cache show policy postgresql|grep Version)
-```
+\`\`\`
 A tarball of the configuration Directory $BAREOS_BASE_DIR is available at [http://$SERVER:81/$CFG_TAR](http://$SERVER:81/$CFG_TAR)
 
 This Page is also availlable on: [http://$SERVER:81/bareos-doc.html](http://$SERVER:81/bareos-doc.html)
@@ -293,20 +293,18 @@ This Page is also availlable on: [http://$SERVER:81/bareos-doc.html](http://$SER
 #} # conf_fileset
 
 
-
-
-
-
 restart_daemons() {
-	w -R $BAROS_USER. $BAROS_BASE_DIR
+	w -R $BAREOS_USER. $BAREOS_BASE_DIR
 	service bareos-dir restart
 	service bareos-fd restart
 	ervice bareos-sd restart
 } #restart_daemons
 
+
 reload_director(){
 	echo reload | bconsole
 } #reload_director
+
 
 finish_docu() {
 	cd /etc
@@ -315,7 +313,7 @@ finish_docu() {
 	cp $WORK_DIR/$CFG_TAR /root
 	cd $WORK_DIR
 	cp $CONFIG_DOC /root
-	pandoc -f markdown_github -t plain ${CONFIG_DOC} |$mail_prg -s "Backupserver BareOS Installation Report" -A ${CONFIG_DOC} -A $WORK_DIR/$CFG_TAR root
+	pandoc -f markdown_github -t plain ${CONFIG_DOC} |$mail -s "Backupserver BareOS Installation Report" -A ${CONFIG_DOC} -A $WORK_DIR/$CFG_TAR root
 	pandoc --ascii -f markdown_github -t html ${CONFIG_DOC} > $HTML_TGT/$(basename $CONFIG_DOC .md).html
 } # finish_docu
 

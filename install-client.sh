@@ -32,15 +32,15 @@ GIT_REPO_NAME="bareos"
 GIT_REPO="https://github.com/chymian/$GIT_REPO_NAME"
 
 # miscellanious
-BAROS_USER="bareos"
-BAROS_BASE_DIR="/etc/bareos"
-BAREOSDIR_DIR="$BAROS_BASE_DIR/bareos-dir.d"
+BAREOS_USER="bareos"
+BAREOS_BASE_DIR="/etc/bareos"
+BAREOSDIR_DIR="$BAREOS_BASE_DIR/bareos-dir.d"
 
 PREREQ="pwgen uuid-runtime git make"
 agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
 agu='apt-get update'
 DEBIAN_FRONTEND=noninteractive
-mail_prog=/usr/bin/mail.mailutils
+mail=/usr/bin/mail.mailutils
 HTML_TGT=/var/www/html
 CFG_TAR=bareos-etc.tar.gz
 
@@ -100,11 +100,11 @@ EOF
 
 echo "
 ## Client added
-```
+\`\`\`
 Hostname/IP: $1
 JobDef:      $2
 Fileset:     $3
-```
+\`\`\`
 " >> $CONFIG_DOC
 } # client_job
 
