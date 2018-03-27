@@ -53,9 +53,9 @@ clientname can be a resolvable Hostname or an IP-Address.
    -f <fileset> Use FileSet <fileset> instaed of Default FileSet
    -h           Show this message.
    -j <jobdef>  Use Jobdef <jobdef> instaed of Default JobDef
+   -l           List JobDefs and FileSets
    -m           Mail the updated Config-Docu and config-tarball
 
-Without Parameters, all existing JobDefs and FileSets will be listed.
 Docu & config-Tarball are not automatically updated.
 Use \"-m\" on last client or by it's own at the end of your Setups.
 
@@ -63,37 +63,42 @@ Use \"-m\" on last client or by it's own at the end of your Setups.
 exit 0
 } # usage
 
-main() {
-	if [ "$#" == "0" ]; then
+list_defs() {
 		echo "existing JobDefs:"
 		echo "$(grep -i Name $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"=" -f2|sort -u)"
 		echo
 		echo "existing FileSets:"
 		echo "$(grep -i Name $BAREOSDIR_DIR/fileset/*.conf|cut -d"=" -f2|sort -u)"
-		exit 0
-	else
-		case $1 in
-			-j)
-				JOBSET=$2
-				shift; shift
-				;;
-			-f)
-				FILESET=$2
-				shift; shift
-				;;
-			-m)
-				FINISH_DOCU=`true`
-				shift
-				;;
-			-h)
-				usage
-				;;
-			*)
-				CLIENT=$1
-				shift
-				client_job ${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
-		esac
-	fi
+
+} # list_defs
+
+main() {
+	case $1 in
+		-j)
+			JOBSET=$2
+			shift; shift
+			;;
+		-f)
+			FILESET=$2
+			shift; shift
+			;;
+		-l)
+			list_defs
+			shift
+			;;
+		-m)
+			FINISH_DOCU=`true`
+			shift
+			;;
+		-h)
+			usage
+			;;
+		*)
+			CLIENT=$1
+			shift
+			client_job ${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
+			;;
+	esac
 
 	$FINISH_DOCU && finish_docu
 } #main
