@@ -45,22 +45,6 @@ HTML_TGT="/var/www/html"
 CFG_TAR="bareos-etc.tar.gz"
 FINISH_DOCU="no"
 
-echo Called with Paramters: $*
-# Note that we use "$@" to let each command-line parameter expand to a
-# separate word. The quotes around "$@" are essential!
-# We need TEMP as the 'eval set --' would nuke the return value of getopt.
-TEMP=$(getopt -o 'mlhj:f:' -- "$@")
-
-if [ $? -ne 0 ]; then
-	echo 'Terminating...' >&2
-	usage
-		exit 1
-fi
-
-# Note the quotes around "$TEMP": they are essential!
-eval set -- "$TEMP"
-unset TEMP
-
 
 usage() {
 	echo "usage: $(basename $0) [-j <jobdef> -f <fileset>]  <clientname>
@@ -91,30 +75,29 @@ list_defs() {
 
 
 main() {
-	echo "main called with:" "$@"
 	while true; do
 		case "$1" in
 			'-j')
 				JOBSET=$2
-				echo "Option -j, Arg: '$2'"
+				#echo "Option -j, Arg: '$2'"
 				shift 2
 				continue
 				;;
 			'-f')
 				FILESET=$2
-				echo "Option -f, Arg: '$2'"
+				#echo "Option -f, Arg: '$2'"
 				shift 2
 				continue
 				;;
 			'-l')
-				echo "Option -l"
+				#echo "Option -l"
 				list_defs
 				shift
 				break
 				;;
 			'-m')
 				FINISH_DOCU=yes
-				echo "Option -m"
+				#echo "Option -m"
 				shift
 				continue
 				;;
@@ -129,10 +112,10 @@ main() {
 				;;
 			*)
 				CLIENT=$1
-				echo "Option -c , Arg: '$1', Clientname: $CLIENT"
-				echo "calling client_add with: " "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}"
+				#echo "Option -c , Arg: '$1', Clientname: $CLIENT"
+				#echo "calling client_add with: " "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}"
 				client_add "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}"
-				echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
+				#echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
 				client_job "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
 				shift
 				break
@@ -145,7 +128,7 @@ main() {
 		exit 0
 	}
 
-	[ $CLIENT = "" ] && {
+	[ "$CLIENT" == "" ] && {
 		echo "clientname missing, Aborting…" >&2
 		exit 2
 	}
@@ -192,7 +175,6 @@ Fileset:     $3
 \`\`\`
 " >> $CONFIG_DOC
 
-
 } # client_job
 
 finish_docu() {
@@ -205,6 +187,21 @@ finish_docu() {
 	pandoc -f markdown_github -t plain ${CONFIG_DOC} |$mail -s "Backupserver BareOS Installation Report" -A ${CONFIG_DOC} -A $WORK_DIR/$CFG_TAR root
 	pandoc --ascii -f markdown_github -t html ${CONFIG_DOC} > $HTML_TGT/$(basename $CONFIG_DOC .md).html
 } # finish_docu
+
+# Note that we use "$@" to let each command-line parameter expand to a
+# separate word. The quotes around "$@" are essential!
+# We need TEMP as the 'eval set --' would nuke the return value of getopt.
+TEMP=$(getopt -o 'mlhj:f:' -- "$@")
+
+if [ $? -ne 0 ]; then
+	echo 'Terminating...' >&2
+	usage
+		exit 1
+fi
+
+# Note the quotes around "$TEMP": they are essential!
+eval set -- "$TEMP"
+unset TEMP
 
 # Main
 main "$@"
