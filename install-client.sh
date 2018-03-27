@@ -125,7 +125,7 @@ main() {
 			*)
 				CLIENT=$1
 				echo "Option keine , Arg: '$1'"
-				client_job ${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
+				client_job "$1" ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}
 				shift
 				break
 				;;
