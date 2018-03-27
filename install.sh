@@ -142,7 +142,7 @@ BarOS Version:   16.2
 	}
 
 
-echo "## Targets are mounted under \`/var/lib/bareos\` `and available on:
+echo "## Targets are mounted under \`/var/lib/bareos\` and available on:
 \`\`\`
 Backup Volume:       $BACKUP_VOL
 Backup Target:       $BACKUP_TGT
