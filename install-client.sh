@@ -64,7 +64,7 @@ exit 0
 } # usage
 
 main() {
-	if [ $# = 0 ]; then
+	if [ "$#" == "0" ]; then
 		echo "existing JobDefs:"
 		echo "$(grep -i Name $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"=" -f2|sort -u)"
 		echo
