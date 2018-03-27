@@ -55,7 +55,7 @@ GIT_REPO="https://github.com/chymian/$GIT_REPO_NAME"
 # miscellanious
 BAREOS_USER="bareos"
 BAREOS_BASE_DIR="/etc/bareos"
-BAREOSDIR_DIR="$BAROS_BASE_DIR/bareos-dir.d"
+BAREOSDIR_DIR="$BAREOS_BASE_DIR/bareos-dir.d"
 
 PREREQ="pwgen uuid-runtime git make mailutils pandoc"
 agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
@@ -142,7 +142,7 @@ BarOS Version:   16.2
 	}
 
 
-echo "## Targets are mounted under \`\`\`/var/lib/bareos\`\`\` and available on:
+echo "## Targets are mounted under \`/var/lib/bareos\` `and available on:
 \`\`\`
 Backup Volume:       $BACKUP_VOL
 Backup Target:       $BACKUP_TGT
@@ -179,10 +179,10 @@ install_base() {
 
 	$agi postgresql
 	$agi bareos bareos-database-postgresql
-	chown -R $BAROS_USER. $SD_TGT $SAMPLE_DIR
+	chown -R $BAREOS_USER. $SD_TGT $SAMPLE_DIR
 
 	# to use the directory-structure (>=16.2), move old-style conf-files out of the way
-	cd $BAROS_BASE_DIR
+	cd $BAREOS_BASE_DIR
 	[ -f bareos-dir.conf ] && mv bareos-dir.conf .bareos-dir.conf
 	[ -f bareos-fd.conf  ] && mv bareos-fd.conf .bareos-fd.conf
 	[ -f bareos-sd.conf  ] && mv bareos-sd.conf .bareos-sd.conf
@@ -238,10 +238,9 @@ configure_base() {
 	for i in `grep bareos-mon -lr * `; do sed -i s/bareos-mon/$SERVER-mon/g $i; done
 	for i in `grep bareos-sd -lr * `; do sed -i s/bareos-sd/$SERVER-sd/g $i; done
 
-	# copy the sample-configs to $BAROS_BASE_DIR
-	cp --backup=t -a $SAMPLE_DIR/* $BAROS_BASE_DIR
+	# copy the sample-configs to $BAREOS_BASE_DIR
+	cp --backup=t -a $SAMPLE_DIR/* $BAREOS_BASE_DIR
 
-	#sed -i "s/Address = .*/Address = $SERVER/g" $BAROS_BASE_DIR/bareos-dir.d/storage/File.conf
 
 	# make sure, client is set in job/BackupCatalog.conf
 	if [ `grep -ci client $BAREOSDIR_DIR/job/BackupCatalog.conf` = 1 ] ; then
@@ -274,11 +273,11 @@ echo "
 Succesfully installed:
 \`\`\`
 Server:     ${SERVER}
-OS:         $(lsb_release -d)
-BareOS:     $(apt-cache show policy bareos|grep Version)
-PostgreSQL: $(apt-cache show policy postgresql|grep Version)
+OS:         $(lsb_release -d|awk '{print $2}')
+BareOS:     $(apt-cache show policy bareos|grep Version|awk '{print $2}')
+PostgreSQL: $(apt-cache show policy postgresql|grep Version|awk '{print $2}')
 \`\`\`
-A tarball of the configuration Directory $BAREOS_BASE_DIR is available at [http://$SERVER:81/$CFG_TAR](http://$SERVER:81/$CFG_TAR)
+A tarball of the configuration Directory \'$BAREOS_BASE_DIR\' is available at [http://$SERVER:81/$CFG_TAR](http://$SERVER:81/$CFG_TAR)
 
 This Page is also availlable on: [http://$SERVER:81/bareos-doc.html](http://$SERVER:81/bareos-doc.html)
 
@@ -288,22 +287,18 @@ This Page is also availlable on: [http://$SERVER:81/bareos-doc.html](http://$SER
 
 } # configure_base
 
-#conf_fileset() {
-	# using configured basic filesets from GIT
-#} # conf_fileset
-
 
 restart_daemons() {
-	w -R $BAREOS_USER. $BAREOS_BASE_DIR
+	chown -R $BAREOS_USER. $BAREOS_BASE_DIR
 	service bareos-dir restart
 	service bareos-fd restart
-	ervice bareos-sd restart
-} #restart_daemons
+	service bareos-sd restart
+} # restart_daemons
 
 
 reload_director(){
 	echo reload | bconsole
-} #reload_director
+} # reload_director
 
 
 finish_docu() {
