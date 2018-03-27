@@ -182,4 +182,4 @@ finish_docu() {
 } # finish_docu
 
 # Main
-main
+main "$@"
