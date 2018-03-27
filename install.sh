@@ -257,7 +257,8 @@ configure_base() {
 	fi
 
 echo "## BareOS Services Passwords
-"
+\`\`\`
+" >> $CONFIG_DOC
 for i in DIRECTOR CLIENT STORAGE ; do
 	printf "${i}_PASSWORD:\t\t$(grep ${i}_PASSWORD $BAREOS_BASE_DIR/.rndpwd|cut -d"=" -f2)\n" >> $CONFIG_DOC
 done
@@ -266,9 +267,9 @@ for i in DIRECTOR_MONITOR CLIENT_MONITOR STORAGE_MONITOR; do
 	printf "${i}_PASSWORD:\t$(grep ${i}_PASSWORD $BAREOS_BASE_DIR/.rndpwd|cut -d"=" -f2)\n" >> $CONFIG_DOC
 
 done
-
-echo "
-## End of Server-Installation
+echo "\`\`\`
+"
+echo "## End of Server-Installation
 
 Succesfully installed:
 \`\`\`
