@@ -145,7 +145,7 @@ BarOS Version:   16.2
 	mount -a
 	# mount the $BACKUP_TGT & rootfs-root
 	[ -d /var/lib/bareos/storage ] || {
-		echo "ERR: Cannot mount $i on alternate mountpoint. exiting…"
+		echo "ERR: Cannot mount /var/lib/bareos. exiting…"
 		exit 2
 	}
 
