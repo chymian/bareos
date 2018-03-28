@@ -188,6 +188,8 @@ Include {
     Signature=SHA1
     compression=gzip     # on 16.2 and later, use LZ4 or LZ4HC
     sparse = yes
+    aclsupport = yes
+    xattrsupport = yes
     …
   }  
 }
@@ -405,6 +407,8 @@ bconsole
 ## ToDo  
 * LongTerm retentionTime must be longer then longest Vacation
 * Base Backups  
+* Client initiated Connections
+* incremental filesize = 200M (wg. retentionTime)
 
 #### Writing Bootstrap files (to REAR-USB?)
 Create better bootstrap-files and copy them to REAR-USB.  

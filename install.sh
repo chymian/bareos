@@ -64,6 +64,8 @@ DEBIAN_FRONTEND=noninteractive
 mail=/usr/bin/mail.mailutils
 HTML_TGT=/var/www/html
 CFG_TAR=bareos-etc.tar.gz
+ROOTFS_UUID=$(findmnt -no UUID)
+ROOTFS_OPTIONS=$(for i in $(grep $ROOTFS_UUID /etc/fstab|awk '{print $4}'|cut -d',' --output-delimiter=" " -f1,2,3,4,5,6,7,8,9,10); do echo $i; done|grep -v subvol|xargs|tr " " ",")
 
 usage() {
 # Switches not implemented yes
@@ -128,18 +130,25 @@ BarOS Version:   16.2
 	[ -d $BOOTSTRAP_TGT ] || btrfs sub cr $BOOTSTRAP_TGT
 	btrfs quota enable $BOOTSTRAP_TGT
 
-	# add to fstab
+	# add root-subvol mount /mnt/.btrfs/root to fstab
+	grep -v "/mnt/.btrfs/root" /etc/fstab > /tmp/fstab.tmp
+	printf "UUID=${ROOTFS_UUID}\t/mnt/.btrfs/root\tbtrfs\t${ROOTFS_OPTIONS}\t0 1\n" >> /tmp/fstab.tmp
+	mv --backup=t /tmp/fstab.tmp /etc/fstab
+
+	# add backup-target to fstab
 	grep -v "/var/lib/bareos" /etc/fstab > /tmp/fstab.tmp
-	printf "$BACKUP_TGT\t\t\t/var/lib/bareos\t\tnone\tbind\t0 0\n" >> /tmp/fstab.tmp
+	printf "$BACKUP_TGT\t\t/var/lib/bareos\t\tnone\tbind\t0 0\n" >> /tmp/fstab.tmp
 	mv --backup=t /tmp/fstab.tmp /etc/fstab
 
 	# create mountpoint
-	mkdir -p /var/lib/bareos
-	# mount the $BACKUP_TGT
-	mount /var/lib/bareos || {
-		echo "ERR: Cannot mount $BACKUP_TGT on /var/lib/bareos. exiting"
-		exit 2
-	}
+	mkdir -p /var/lib/bareos /mnt/.btrfs/root
+	# mount the $BACKUP_TGT & rootfs-root
+	for i in $BACKUP_TGT /mnt/.btrfs/root; do
+		mount $i || {
+			echo "ERR: Cannot mount $i on alternate mountpoint. exiting…"
+			exit 2
+		}
+	fi
 
 
 echo "## Targets are mounted under \`/var/lib/bareos\` and available on:

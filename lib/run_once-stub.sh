@@ -2,7 +2,7 @@
 # Run once to reset services
 #
 
-export  DEBIAN_FRONTEND=noninteractive
+DEBIAN_FRONTEND=noninteractive
 NOT_EXECUTED=/root/.run_once_not_yet
 
 if [ "$1" = "" ]; then
