@@ -218,6 +218,8 @@ install_webui() {
 	sed -i s/443/8443/g ports.conf
 	a2dissite 000-default
 	a2enconf bareos-webui
+	a2enmod proxy_fcgi setenvif
+	a2enconf php7.0-fpm
 	service  apache2 restart
 
 	# generate a PW if empty
