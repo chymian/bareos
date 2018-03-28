@@ -142,13 +142,12 @@ BarOS Version:   16.2
 
 	# create mountpoint
 	mkdir -p /var/lib/bareos /mnt/.btrfs/root
+	mount -a
 	# mount the $BACKUP_TGT & rootfs-root
-	for i in $BACKUP_TGT /mnt/.btrfs/root; do
-		mount $i || {
-			echo "ERR: Cannot mount $i on alternate mountpoint. exiting…"
-			exit 2
-		}
-	done
+	[ `findmnt -M /var/lib/bareos/ 2>&1 >/dev/null` ] || {
+		echo "ERR: Cannot mount $i on alternate mountpoint. exiting…"
+		exit 2
+	}
 
 
 echo "## Targets are mounted under \`/var/lib/bareos\` and available on:
