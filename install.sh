@@ -64,7 +64,7 @@ DEBIAN_FRONTEND=noninteractive
 mail=/usr/bin/mail.mailutils
 HTML_TGT=/var/www/html
 CFG_TAR=bareos-etc.tar.gz
-ROOTFS_UUID=$(findmnt -no UUID)
+ROOTFS_UUID=$(findmnt -no UUID /)
 ROOTFS_OPTIONS=$(for i in $(grep $ROOTFS_UUID /etc/fstab|awk '{print $4}'|cut -d',' --output-delimiter=" " -f1,2,3,4,5,6,7,8,9,10); do echo $i; done|grep -v subvol|xargs|tr " " ",")
 
 usage() {
@@ -148,7 +148,7 @@ BarOS Version:   16.2
 			echo "ERR: Cannot mount $i on alternate mountpoint. exiting…"
 			exit 2
 		}
-	fi
+	done
 
 
 echo "## Targets are mounted under \`/var/lib/bareos\` and available on:
@@ -161,7 +161,7 @@ Bootstrap Target:    $BOOTSTRAP_TGT
 " >> $CONFIG_DOC
 
 
-	# update git-repo with my sample-configs
+	# update from git-repo
 	cd $WORK_DIR
 	git pull
 
