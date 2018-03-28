@@ -283,7 +283,7 @@ echo "## End of Server-Installation
 Succesfully installed:
 \`\`\`
 Server:     ${SERVER}
-OS:         $(lsb_release -d|awk '{print $2,$3,$4,%5}')
+OS:         $(lsb_release -d|awk '{print $2,$3,$4,$5}')
 BareOS:     $(apt-cache show policy bareos|grep Version|awk '{print $2}')
 PostgreSQL: $(apt-cache show policy postgresql|grep Version|awk '{print $2}')
 \`\`\`
