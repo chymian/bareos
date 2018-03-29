@@ -78,6 +78,7 @@ list_defs() {
 
 
 main() {
+	i=0
 	while [ $i -le $# ]; do
 		echo "Anz: $#; i = $i; Para:" "@$"
 		(( i++ ))
