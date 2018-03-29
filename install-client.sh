@@ -78,7 +78,8 @@ list_defs() {
 
 
 main() {
-	while true; do
+	while i <= $#; do
+		(( i++ ))
 		case "$1" in
 			'-c')
 				CLIENT_INI_CONN=yes
