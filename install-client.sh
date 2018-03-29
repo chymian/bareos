@@ -173,7 +173,18 @@ configure add client \
   ConnectionFromClientToDirector=yes
 reload
 EOF
+	# add CIC & Address in exported-file
 	sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  Address = ${SERVER}\n}/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
+	# Create Logfile entry in Standard-Message file for client
+	mkdir -p ${BAREOS_EXPORT_DIR}/client/${CLIENT}-fd/bareos-fd.d/messages
+	cat << EOF > ${BAREOS_EXPORT_DIR}/client/${CLIENT}-fd/bareos-fd.d/messages/Standard.conf
+Messages {
+  Name = Standard
+  Director = ${SERVER}-dir = all, !skipped, !restored
+  Description = "Send relevant messages to the Director."
+  Append = "/var/log/bareos/bareos-fd.log" = all, !skipped, !restored
+}
+EOF
 	else
 		bconsole << EOF
 configure add client \
@@ -250,7 +261,7 @@ client_setup() {
 EOF
 
 	# Copy Dirctory Stanza to Client
-	scp  $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/$SERVER-dir.conf root@$CLIENT:/etc/bareos/bareos-fd.d/director/
+	rsync -r  $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d root@$CLIENT:/etc/bareos/
 	ssh root@${CLIENT} bash << EOF
 	chown -R bareos. /etc/bareos
 	service bareos-fd restart
