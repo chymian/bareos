@@ -13,7 +13,7 @@
 # Defaults
 DEFAULT_JOBDEF=DefaultJob
 DEFAULT_SCHEDULE=WeeklyCycle
-DEFAULT_FILESET=LinuxALL
+DEFAULT_FILESET=LinuxAll
 
 # Tuneable varibales
 BACKUP_VOL="/srv/dev-disk-by-label-backup"
