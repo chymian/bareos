@@ -152,7 +152,7 @@ main() {
 		client_add "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
 		echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
 		client_job "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
-		if [ "$CLIENT_INSTALL" = "yes" ]; then
+		if [ "$CLIENT_SETUP" = "yes" ]; then
 			client_setup
 		fi
 	elif [ $FINISH_DOCU = "yes" ]; then
@@ -229,7 +229,7 @@ client_setup() {
 	# copy SSH-key to client
 
 	echo "################################################################"
-	echo "   Attention: Please give root@{CLIENT} Password, if asked for.
+	echo "   Attention: Please give root@{CLIENT} Password, if asked for."
 	echo "################################################################"
 
 	ssh-copy-id root@${CLIENT}
