@@ -131,23 +131,21 @@ main() {
 		esac
 	done
 
-	CLIENT=$1
-	#echo "Option -c , Arg: '$1', Clientname: $CLIENT"
-	echo "calling client_add with: " "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
-	client_add "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
-	#echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
-	client_job "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
-
-
-	[ $FINISH_DOCU = "yes" ] && {
-		finish_docu
-		exit 0
-	}
-
-	[ "$CLIENT" == "" ] && {
+	if [ "$1" == "" -a $FINISH_DOCU != "yes" ]; then
 		echo "clientname missing, Aborting…" >&2
 		exit 2
-	}
+	elif [ "$1" != "" ]; then
+		CLIENT=$1
+		#echo "Option -c , Arg: '$1', Clientname: $CLIENT"
+		echo "calling client_add with: " "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
+		client_add "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
+		#echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
+		client_job "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
+	elif [ $FINISH_DOCU = "yes" ]; then
+		finish_docu
+		exit 
+	fi
+
 } #main
 
 client_add() {
