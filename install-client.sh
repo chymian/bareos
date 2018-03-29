@@ -111,7 +111,7 @@ main() {
 				FINISH_DOCU=yes
 				#echo "Option -m"
 				shift
-				break
+				continue
 				;;
 			'-h')
 				#echo "Option -h"
@@ -122,7 +122,7 @@ main() {
 				#echo "Option -s"
 				CLIENT_SETUP=yes
 				shift
-				break
+				continue
 				;;
 			'--')
 				shift
