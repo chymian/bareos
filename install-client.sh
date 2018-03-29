@@ -184,7 +184,7 @@ configure add client \
 reload
 EOF
 	fi
-	sed -i "s/Password =.*/Password = $2/g $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
+	sed -i "s/Password =.*/Password = $2/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
 echo "
 ## Client $1 added
 \`\`\`
