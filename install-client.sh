@@ -236,13 +236,13 @@ client_setup() {
 	ssh root@${CLIENT} bash  << EOF
 	apt-get update
 	apt-get -y install bareos-client
-	EOF
+EOF
 
 	# Copy Dirctory Stanza to Client
 	scp  $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/$SERVER-dir.conf root@$CLIENT:/etc/bareos/bareos-fd.d/director/
 	ssh root@${CLIENT} bconsole << EOF
 	reload
-	EOF
+EOF
 
 	echo "**Bareos-Client-SW installed**
 	" >> $CONFIG_DOCU
