@@ -36,7 +36,7 @@ GIT_REPO="https://github.com/chymian/$GIT_REPO_NAME"
 BAREOS_USER="bareos"
 BAREOS_BASE_DIR="/etc/bareos"
 BAREOS_DIR_DIR="$BAREOS_BASE_DIR/bareos-dir.d"
-BAREOS_EXPORT_DIR="$BAREOS_BASE_DIR/bareos-dir-export/"
+BAREOS_EXPORT_DIR="$BAREOS_BASE_DIR/bareos-dir-export"
 
 PREREQ="pwgen uuid-runtime git make"
 agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
@@ -79,8 +79,9 @@ list_defs() {
 
 main() {
 	i=0
-	while [ $i -le $# ]; do
-		echo "Anz: $#; i = $i; Para:" "@$"
+	N=$#
+	while [ $i -le $N ]; do
+		echo "Anz: $#; i = $i; Para:" "$@"
 		(( i++ ))
 		case "$1" in
 			'-c')
@@ -89,7 +90,7 @@ main() {
 				continue
 				;;
 			'-j')
-				JOBSET=$2
+				JOBDEF=$2
 				#echo "Option -j, Arg: '$2'"
 				shift 2
 				continue
@@ -162,7 +163,7 @@ configure add client \
   ConnectionFromClientToDirector=yes
 reload
 EOF
-	sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  \}/g" $BAREOS_EXPORT_DIR=/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
+	sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  \}/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
 	else
 		bconsole << EOF
 configure add client \
