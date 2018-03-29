@@ -218,7 +218,7 @@ finish_docu() {
 # Note that we use "$@" to let each command-line parameter expand to a
 # separate word. The quotes around "$@" are essential!
 # We need TEMP as the 'eval set --' would nuke the return value of getopt.
-TEMP=$(getopt -o 'cmjlh:f:' -- "$@")
+TEMP=$(getopt -o 'cmlhj:f:' -- "$@")
 
 if [ $? -ne 0 ]; then
 	echo 'Terminating...' >&2
