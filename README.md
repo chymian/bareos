@@ -423,7 +423,8 @@ see [about bootstrap files](http://doc.bareos.org/master/html/bareos-manual-main
 see [FileSet Definitions](http://doc.bareos.org/master/html/bareos-manual-main-reference.html#QQ2-1-226)  
 either use (raw) image-backup @HOST or use  
 
-##### Client initiated Connections for NotAlwaysOn VPS/LXCs
+##### Client initiated Connections for NotAlwaysOn VPS/LXCs/Laptops
+@Server
 in `/etc/bareos/bareos-dir.d/clients/` or per bconsole add to the usual client cmd:
 
 ```
@@ -433,13 +434,10 @@ Password = <password>
 Connection From Client To Director = yes     # to start backups from client
 ```
 
-To only allow Connection From the Client to the Director use:
-* Connection From Director To Client Dir Client = no
-* Connection From Client To Director Dir Client = yes
-* Heartbeat Interval Dir Client = 60 # to keep the network connection established
-* Connection From Director To Client Fd Director = no
-* Connection From Client To Director Fd Director = yes
-
+@Client in `/etc/bareos/bareos-fd.d/director`
+```
+Connection From Client To Director Fd Director = yes
+```
 
 #### Snapshotting System for Backups
 see job(defs)

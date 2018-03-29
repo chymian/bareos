@@ -14,6 +14,7 @@
 DEFAULT_JOBDEF=DefaultJob
 DEFAULT_SCHEDULE=WeeklyCycle
 DEFAULT_FILESET=LinuxAll
+CLIENT_INI_CONN=no
 
 # Tuneable varibales
 BACKUP_VOL="/srv/dev-disk-by-label-backup"
@@ -34,7 +35,8 @@ GIT_REPO="https://github.com/chymian/$GIT_REPO_NAME"
 # miscellanious
 BAREOS_USER="bareos"
 BAREOS_BASE_DIR="/etc/bareos"
-BAREOSDIR_DIR="$BAREOS_BASE_DIR/bareos-dir.d"
+BAREOS_DIR_DIR="$BAREOS_BASE_DIR/bareos-dir.d"
+BAREOS_EXPORT_DIR="$BAREOS_BASE_DIR/bareos-dir-export/"
 
 PREREQ="pwgen uuid-runtime git make"
 agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
@@ -51,6 +53,7 @@ usage() {
 Setup a Job for client with the defaults JobDef: $DEFAULT_JOB and FileSet: $DEFAULT_FILESET.
 clientname can be a resolvable Hostname or an IP-Address.
 
+   -c		Use Client Initiated Connections, for \"not always on hosts\", like Laptops, VPS, etc
    -f <fileset> Use FileSet <fileset> instaed of Default FileSet
    -h           Show this message.
    -j <jobdef>  Use Jobdef <jobdef> instaed of Default JobDef
@@ -66,10 +69,10 @@ exit 0
 
 list_defs() {
 		echo "existing JobDefs:"
-		echo "$(grep -i Name $BAREOSDIR_DIR/jobdefs/*.conf|cut -d"=" -f2|sort -u)"
+		echo "$(grep -i Name $BAREOS_DIR_DIR/jobdefs/*.conf|cut -d"=" -f2|sort -u)"
 		echo
 		echo "existing FileSets:"
-		echo "$(grep -i Name $BAREOSDIR_DIR/fileset/*.conf|cut -d"=" -f2|sort -u)"
+		echo "$(grep -i Name $BAREOS_DIR_DIR/fileset/*.conf|cut -d"=" -f2|sort -u)"
 
 } # list_defs
 
@@ -77,6 +80,11 @@ list_defs() {
 main() {
 	while true; do
 		case "$1" in
+			'-c')
+				CLIENT_INI_CONN=yes
+				shift
+				continue
+				;;
 			'-j')
 				JOBSET=$2
 				#echo "Option -j, Arg: '$2'"
@@ -114,7 +122,7 @@ main() {
 				CLIENT=$1
 				#echo "Option -c , Arg: '$1', Clientname: $CLIENT"
 				#echo "calling client_add with: " "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}"
-				client_add "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}"
+				client_add "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
 				#echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
 				client_job "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
 				shift
@@ -135,20 +143,34 @@ main() {
 } #main
 
 client_add() {
-	bconsole << EOF
+	if [ "$3"="yes" ]; then
+		bconsole << EOF
 configure add client \
   name=$1-fd \
   address=$1 \
   password=$2 \
-  AutoPrune=yes
+  AutoPrune=yes \
+  ConnectionFromClientToDirector=yes
 reload
 EOF
-
+	sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  \}/g" $BAREOS_EXPORT_DIR=/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
+	else
+		bconsole << EOF
+configure add client \
+  name=$1-fd \
+  address=$1 \
+  password=$2 \
+  AutoPrune=yes \
+  ConnectionFromClientToDirector=yes
+reload
+EOF
+	fi
 echo "
 ## Client $1 added
 \`\`\`
-Hostname/IP: $1
-ClientPW     $2
+Hostname/IP:                $1
+ClientPW:                   $2
+Client Initiate Connection: $3
 \`\`\`
 " >> $CONFIG_DOC
 
