@@ -78,7 +78,8 @@ list_defs() {
 
 
 main() {
-	while i <= $#; do
+	while i <= "$#"; do
+		echo "Anz: $#; i = $i; Para:" "@$"
 		(( i++ ))
 		case "$1" in
 			'-c')
@@ -116,7 +117,7 @@ main() {
 				;;
 			'--')
 				shift
-				continue
+				break
 				;;
 #			*)
 #				CLIENT=$1
@@ -129,6 +130,7 @@ main() {
 #				break
 #				;;
 		esac
+		echo "End of case Paramters:" "$@"
 	done
 
 	if [ "$1" == "" -a $FINISH_DOCU != "yes" ]; then
