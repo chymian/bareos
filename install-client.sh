@@ -59,6 +59,7 @@ clientname can be a resolvable Hostname or an IP-Address.
    -j <jobdef>  Use Jobdef <jobdef> instaed of Default JobDef
    -l           List JobDefs and FileSets
    -m           Mail the updated Config-Docu and config-tarball
+   -s           Setup Client with bareos-fd & copy Director-definition to it
 
 Docu & config-Tarball are not automatically updated.
 Use \"-m\" on last client or by it's own at the end of your Setups.
@@ -113,9 +114,15 @@ main() {
 				break
 				;;
 			'-h')
-				echo "Option -h"
+				#echo "Option -h"
 				usage
 				exit 1
+				;;
+			'-s')
+				#echo "Option -s"
+				CLIENT_SETUP=yes
+				shift
+				break
 				;;
 			'--')
 				shift
@@ -145,6 +152,9 @@ main() {
 		client_add "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
 		echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
 		client_job "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
+		if [ "$CLIENT_INSTALL" = "yes" ];; then
+			client_setup
+		fi
 	elif [ $FINISH_DOCU = "yes" ]; then
 		finish_docu
 		exit 
@@ -208,6 +218,36 @@ Fileset:     $3
 
 } # client_job
 
+sshkey-check() {
+	# generating SSH-keys
+	[ -f $HOME/.ssh/id_rsa ] || {
+		ssh-keygen -b 4049 -t rsa -f $HOME/id_rsa
+	}
+} # sshkey-check
+
+client_setup() {
+	# copy SSH-key to client
+
+	echo "################################################################"
+	echo "   Attention: Please give root@{CLIENT} Password, if asked for.
+	echo "################################################################"
+
+	ssh-copy-id root@${CLIENT}
+	ssh root@${CLIENT} bash  << EOF
+	apt-get update
+	apt-get -y install bareos-client
+	EOF
+
+	# Copy Dirctory Stanza to Client
+	scp  $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/$SERVER-dir.conf root@$CLIENT:/etc/bareos/bareos-fd.d/director/
+	ssh root@${CLIENT} bconsole << EOF
+	reload
+	EOF
+
+	echo "**Bareos-Client-SW installed**
+	" >> $CONFIG_DOCU
+}
+
 finish_docu() {
 	cd /etc
 	tar czf $WORK_DIR/$CFG_TAR bareos
@@ -222,7 +262,7 @@ finish_docu() {
 # Note that we use "$@" to let each command-line parameter expand to a
 # separate word. The quotes around "$@" are essential!
 # We need TEMP as the 'eval set --' would nuke the return value of getopt.
-TEMP=$(getopt -o 'cmlhj:f:' -- "$@")
+TEMP=$(getopt -o 'cmlhsj:f:' -- "$@")
 
 if [ $? -ne 0 ]; then
 	echo 'Terminating...' >&2
