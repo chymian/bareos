@@ -160,8 +160,7 @@ configure add client \
   name=$1-fd \
   address=$1 \
   password=$2 \
-  AutoPrune=yes \
-  ConnectionFromClientToDirector=yes
+  AutoPrune=yes
 reload
 EOF
 	fi
