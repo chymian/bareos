@@ -233,7 +233,11 @@ client_setup() {
 	echo "   Attention: Please give root@{CLIENT} Password, if asked for."
 	echo "################################################################"
 
-	ssh-copy-id root@${CLIENT}
+	ssh-copy-id root@${CLIENT} || {
+		echo err: No sshkey copy possible, Password-Auth blocked from $CLIENT
+		echo Please copy your ssh-keys manualy over.
+		exit 3
+	}
 	ssh root@${CLIENT} bash  << EOF
 	apt-get update
 	apt-get -y install bareos-client
@@ -246,7 +250,7 @@ EOF
 EOF
 
 	echo "**Bareos-Client-SW installed**
-	" >> $CONFIG_DOCU
+" >> $CONFIG_DOC
 }
 
 finish_docu() {
