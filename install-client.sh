@@ -49,11 +49,11 @@ FINISH_DOCU="no"
 
 
 usage() {
-	echo "usage: $(basename $0) [-j <jobdef> -f <fileset>]  <clientname>
-Setup a Job for client with the defaults JobDef: $DEFAULT_JOB and FileSet: $DEFAULT_FILESET.
+	echo "usage: $(basename $0) [options] <clientname>
+Setup a Job for client with the defaults JobDef: $DEFAULT_JOBDEF and FileSet: $DEFAULT_FILESET.
 clientname can be a resolvable Hostname or an IP-Address.
 
-   -c		Use Client Initiated Connections, for \"not always on hosts\", like Laptops, VPS, etc
+   -c		Use \"Client initiated Connections\" for \"not always on hosts\", like Laptops, VM, etc.
    -f <fileset> Use FileSet <fileset> instaed of Default FileSet
    -h           Show this message.
    -j <jobdef>  Use Jobdef <jobdef> instaed of Default JobDef
@@ -82,7 +82,7 @@ main() {
 	i=0
 	N=$#
 	while [ $i -le $N ]; do
-		echo "Anz: $#; i = $i; Para:" "$@"
+		#echo "Anz: $#; i = $i; Para:" "$@"
 		(( i++ ))
 		case "$1" in
 			'-c')
@@ -147,10 +147,10 @@ main() {
 		exit 2
 	elif [ "$1" != "" ]; then
 		CLIENT=$1
-		echo "NoOption Arg: '$1', Clientname: $CLIENT"
-		echo "calling client_add with: " "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
+		#echo "NoOption Arg: '$1', Clientname: $CLIENT"
+		#echo "calling client_add with: " "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
 		client_add "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
-		echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
+		#echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
 		client_job "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
 		if [ "$CLIENT_SETUP" = "yes" ]; then
 			client_setup ${CLIENT}
@@ -187,10 +187,12 @@ EOF
 	sed -i "s/Password =.*/Password = $2/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
 echo "
 ## Client $1 added
+Date:            `date`
+
 \`\`\`
-Hostname/IP:                $1
-ClientPW:                   $2
-Client Initiate Connection: $3
+Hostname/IP:                  $1
+ClientPW:                     $2
+Client initiated Connections: $3
 \`\`\`
 " >> $CONFIG_DOC
 
@@ -219,7 +221,7 @@ Fileset:     $3
 
 } # client_job
 
-sshkey-check() {
+sshkey_check() {
 	# generating SSH-keys
 	[ -f $HOME/.ssh/id_rsa ] || {
 		ssh-keygen -b 4049 -t rsa -f $HOME/id_rsa
@@ -231,9 +233,11 @@ client_setup() {
 	CLIENT=$1
 	# copy SSH-key to client
 
-	echo "################################################################"
+	echo
+	echo "##################################################################"
 	echo "   Attention: Please give root@{CLIENT} Password, if asked for."
-	echo "################################################################"
+	echo "##################################################################"
+	echo
 
 	ssh-copy-id root@${CLIENT} || {
 		echo err: No sshkey copy possible, Password-Auth blocked from $CLIENT
@@ -252,7 +256,8 @@ EOF
 	service bareos-fd restart
 EOF
 
-	echo "**Bareos-Client-SW installed**
+	echo "## Bareos-Client-SW installed
+	ClientSW installed:   yes
 " >> $CONFIG_DOC
 }
 
