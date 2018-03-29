@@ -92,7 +92,7 @@ main() {
 install_prereq() {
 echo "# BareOS Backup Server
 
-## Installationprotocol
+## Installationprotocoll
 \`\`\`
 on:              $SERVER
 Date:            `date`

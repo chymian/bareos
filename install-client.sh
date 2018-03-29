@@ -245,8 +245,9 @@ EOF
 
 	# Copy Dirctory Stanza to Client
 	scp  $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/$SERVER-dir.conf root@$CLIENT:/etc/bareos/bareos-fd.d/director/
-	ssh root@${CLIENT} bconsole << EOF
-	reload
+	ssh root@${CLIENT} bash << EOF
+	chown -R bareos. /etc/bareos
+	service bareos-fd restart
 EOF
 
 	echo "**Bareos-Client-SW installed**
