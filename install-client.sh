@@ -78,7 +78,7 @@ list_defs() {
 
 
 main() {
-	while [ $i <= $# ]; do
+	while [ $i -le $# ]; do
 		echo "Anz: $#; i = $i; Para:" "@$"
 		(( i++ ))
 		case "$1" in
