@@ -173,7 +173,7 @@ configure add client \
   ConnectionFromClientToDirector=yes
 reload
 EOF
-	sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  \}/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
+	sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  Address = ${SERVER}\n}/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
 	else
 		bconsole << EOF
 configure add client \
@@ -184,6 +184,7 @@ configure add client \
 reload
 EOF
 	fi
+	sed -i "s/Password =.*/Password = $2/g $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
 echo "
 ## Client $1 added
 \`\`\`
@@ -226,6 +227,7 @@ sshkey-check() {
 } # sshkey-check
 
 client_setup() {
+	sshkey_check
 	CLIENT=$1
 	# copy SSH-key to client
 
