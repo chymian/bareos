@@ -153,7 +153,7 @@ main() {
 		echo "calling client_job with: " "${CLIENT} ${JOBDEF:-${DEFAULT_JOBDEF}} ${FILESET:-${DEFAULT_FILESET}}"
 		client_job "$CLIENT" "${JOBDEF:-${DEFAULT_JOBDEF}}" "${FILESET:-${DEFAULT_FILESET}}"
 		if [ "$CLIENT_SETUP" = "yes" ]; then
-			client_setup
+			client_setup ${CLIENT}
 		fi
 	elif [ $FINISH_DOCU = "yes" ]; then
 		finish_docu
@@ -226,6 +226,7 @@ sshkey-check() {
 } # sshkey-check
 
 client_setup() {
+	CLIENT=$1
 	# copy SSH-key to client
 
 	echo "################################################################"
