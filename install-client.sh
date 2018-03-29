@@ -99,7 +99,7 @@ main() {
 				FINISH_DOCU=yes
 				#echo "Option -m"
 				shift
-				continue
+				break
 				;;
 			'-h')
 				echo "Option -h"
@@ -145,7 +145,7 @@ reload
 EOF
 
 echo "
-## ClientJob added
+## Client $1 added
 \`\`\`
 Hostname/IP: $1
 ClientPW     $2
@@ -167,7 +167,7 @@ reload
 EOF
 
 echo "
-## ClientJob added
+### ClientJob ${1}-fd added
 \`\`\`
 Hostname/IP: $1
 JobDef:      $2

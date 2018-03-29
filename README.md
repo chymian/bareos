@@ -408,7 +408,10 @@ bconsole
 * LongTerm retentionTime must be longer then longest Vacation
 * Base Backups  
 * Client initiated Connections
+if datavolume is not so big,
 * incremental filesize = 200M (wg. retentionTime)
+* Differential filesize = 500M
+* Full filesize= 10G
 
 #### Writing Bootstrap files (to REAR-USB?)
 Create better bootstrap-files and copy them to REAR-USB.  

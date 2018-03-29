@@ -215,11 +215,14 @@ install_webui() {
 	cd /etc/apache2
 	sed -i s/80/81/g ports.conf
 	sed -i s/443/8443/g ports.conf
-	a2dissite 000-default
-	a2enconf bareos-webui
-	a2enmod proxy_fcgi setenvif
-	a2enconf php7.0-fpm
+	which a2dissite && 2dissite  000-default
+	which a2enmod && a2enmod proxy_fcgi setenvif
+	which a2enconf && a2enconf php7.0-fpm
+	which a2enmod && a2enmod rewrite setenv php7 2> /dev/null || true
+	which a2enmod && a2enmod rewrite setenv php5 2> /dev/null || true
+	which a2enconf && a2enconf bareos-webui
 	service  apache2 restart
+
 
 	# generate a PW if empty
 	WEBUI_PW=${WEBUI_PW:-$(pwgen -1 12)}
@@ -267,8 +270,7 @@ configure_base() {
 	fi
 
 echo "## BareOS Services Passwords
-\`\`\`
-" >> $CONFIG_DOC
+\`\`\`" >> $CONFIG_DOC
 for i in DIRECTOR CLIENT STORAGE ; do
 	printf "${i}_PASSWORD:\t\t$(grep ${i}_PASSWORD $BAREOS_BASE_DIR/.rndpwd|cut -d"=" -f2)\n" >> $CONFIG_DOC
 done
@@ -277,8 +279,9 @@ for i in DIRECTOR_MONITOR CLIENT_MONITOR STORAGE_MONITOR; do
 	printf "${i}_PASSWORD:\t$(grep ${i}_PASSWORD $BAREOS_BASE_DIR/.rndpwd|cut -d"=" -f2)\n" >> $CONFIG_DOC
 
 done
-echo "\`\`\`
-"
+echo "\`\`\` 
+" >> $CONFIG_DOC
+
 echo "## End of Server-Installation
 
 Succesfully installed:
