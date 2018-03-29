@@ -355,7 +355,8 @@ bconsole << EOF
   name=$CLIENT-fd \
   address=$CLIENT \
   password=$PASSWORD \
-  AutoPrune=yes
+  AutoPrune=yes \
+  Connection From Client To Director = no
 reload
 EOF
 ```
@@ -377,6 +378,8 @@ sed -i s/$CLIENT-dir/$SERVER-dir/g bareos-fd.conf
 sed -i s/$CLIENT-mon/$SERVER-mon/g bareos-fd.conf
 # Take PASSWORD from Above and change it in the $SERVER-dir stanza in bareos-fd.conf
 service bareos-fd restart
+# Add if you want Client initiated Connections
+Connection From Client To Director = yes
 ```
 
 ### Add a Client Job  
