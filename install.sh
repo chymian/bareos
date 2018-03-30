@@ -216,11 +216,11 @@ install_webui() {
 	cd /etc/apache2
 	sed -i s/80/81/g ports.conf
 	sed -i s/443/8443/g ports.conf
-	which a2dissite && a2dissite  000-default
-	which a2enmod && a2enmod proxy_fcgi setenvif
-	which a2enconf && a2enconf php7.0-fpm
-	which a2enmod && a2enmod rewrite setenv php7 2> /dev/null || true
-	which a2enmod && a2enmod rewrite setenv php5 2> /dev/null || true
+	#which a2dissite && a2dissite  000-default
+	which a2enmod  && a2enmod proxy_fcgi setenvif 2> /dev/null || true
+	which a2enconf && a2enconf php7.0-fpm 2> /dev/null || true
+	which a2enmod  && a2enmod rewrite setenv php7 2> /dev/null || true
+	which a2enmod  && a2enmod rewrite setenv php5 2> /dev/null || true
 	which a2enconf && a2enconf bareos-webui
 	service  apache2 restart
 
@@ -230,6 +230,53 @@ install_webui() {
 
 	echo "configure add console name=$WEBUI_ADM password=$WEBUI_PW profile=webui-admin"|bconsole
 	reload_director
+
+	# Setup HTAUTH for the config-Doc Website:
+	echo $WEBUI_PW | htpasswd -i -c /var/www/html/.htpasswd admin
+
+	# allow htauth
+	cat << EOF | ssh root@${SERVER} 'cd /etc/apache2/ ; patch -bp3'
+--- /tmp/apache2/apache2.conf	2018-03-31 15:54:33.916158385 +0200
++++ /etc/apache2/apache2.conf	2018-03-31 16:20:46.510808974 +0200
+@@ -169,7 +169,7 @@
+ 
+ <Directory /var/www/>
+ 	Options Indexes FollowSymLinks
+-	AllowOverride None
++	AllowOverride All
+ 	Require all granted
+ </Directory>
+ 
+--- /tmp/apache2/sites-available/000-default.conf	2017-09-19 20:56:09.000000000 +0200
++++ /etc/apache2/sites-available/000-default.conf	2018-03-31 16:22:49.650415936 +0200
+@@ -26,6 +26,13 @@
+ 	# following line enables the CGI configuration for this host only
+ 	# after it has been globally disabled with "a2disconf".
+ 	#Include conf-available/serve-cgi-bin.conf
++
++	<Directory "/var/www/html">
++		AuthType Basic
++		AuthName "Restricted Content"
++		AuthUserFile /etc/apache2/.htpasswd
++		Require valid-user
++	</Directory>
+ </VirtualHost>
+ 
+ # vim: syntax=apache ts=4 sw=4 sts=4 sr noet
+EOF
+
+
+
+
+#	cat << EOF | ssh root@${SERVER} patch -bp1 /etc/apache2/sites-available/000-default
+
+#	sed "s#</VirtualHost>#\n    <Directory \"/var/www/html\">\n\
+#        AuthType Basic\n\
+#        AuthName \"Restricted Content\"\n\
+#        AuthUserFile /var/www/html/apache2/.htpasswd\n\
+#        Require valid-user\n\
+#    </Directory>\n\n\</VirtualHost>#g" /etc/apache2/sites-available/000-default.conf
+
 
 	echo "## Webinterface
 Link: [http://$SERVER:81/bareos-webui/](http://$SERVER:81/bareos-webui/)
@@ -285,7 +332,7 @@ for i in DIRECTOR_MONITOR CLIENT_MONITOR STORAGE_MONITOR; do
 	printf "${i}_PASSWORD:\t$(grep ${i}_PASSWORD $BAREOS_BASE_DIR/.rndpwd|cut -d"=" -f2)\n" >> $CONFIG_DOC
 
 done
-echo "\`\`\` 
+echo "\`\`\`  
 " >> $CONFIG_DOC
 
 echo "## End of Server-Installation
@@ -300,13 +347,10 @@ PostgreSQL: $(apt-cache show policy postgresql|grep Version|awk '{print $2}')
 
 A tarball of the configuration Directory \'$BAREOS_BASE_DIR\' is available at [http://$SERVER:81/$CFG_TAR](http://$SERVER:81/$CFG_TAR)
 
-This Page is also availlable on: [http://$SERVER:81/$(basename $CONFIG_DOC .md).html](http://$SERVER:81/$(basename $CONFIG_DOC .md).html)
+This Page is also availlable on: [http://$SERVER:81/$(basename $CONFIG_DOC .md).html](http://$SERVER:81/$(basename $CONFIG_DOC .md).html) with the WebUI Password, I just mailed you.
 
 ***
 " >> $CONFIG_DOC
-
-
-
 } # configure_base
 
 
@@ -337,3 +381,5 @@ finish_docu() {
 # Main
 main
 restart_daemons
+
+# vim: ts=4 sw=4 sts=4 sr noet
