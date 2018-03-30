@@ -24,17 +24,22 @@ During Installation of the PostGreSQL, you get asked some Questions:
 Use the Defaults, note down your password.
 
 ## Install Clients  
-
-…
-## How to Customize the BareOS-sample Config
-from https://github.com/chymian/bareos-sample.git
-
-maybe: check:
-### Storage Definitions
-In ```/etc/bareos/bareos-dir.d/storage/File.conf``` set Address = [hostname]
 ```
-SERVER=`hostname`
-sed -i "s/Address = .*/Address = $SERVER/g" /etc/bareos/bareos-dir.d/storage/File.conf
+./install-client.sh -h
+usage: install-client.sh [options] <clientname>
+Setup a Job for client with the defaults JobDef: DefaultJob and FileSet: LinuxAll.
+clientname can be a resolvable Hostname or an IP-Address.
+
+   -c           Use "Client initiated Connections" for "not always on hosts", like Laptops, VM, etc.
+   -f <fileset> Use FileSet <fileset> instaed of Default FileSet
+   -h           Show this message.
+   -j <jobdef>  Use Jobdef <jobdef> instaed of Default JobDef
+   -l           List JobDefs and FileSets
+   -m           Mail the updated Config-Docu and config-tarball (use as only switch)
+   -s           Setup Client with bareos-fd & copy Director-definition to it
+
+Docu & config-Tarball are not automatically updated.
+Use "-m" on it's own at the end of your Setups to mail you the configs.
 ```
 
 ### Change BackupTime
