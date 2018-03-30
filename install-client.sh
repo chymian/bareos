@@ -175,6 +175,19 @@ reload
 EOF
 	# add CIC & Address in exported-file
 	sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  Address = ${SERVER}\n}/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
+
+	# Create a bconsole-stanza for this director
+	CONSOLE_PW_LINE=$(grep Password ${BASE_DIR}/bareos-dir.d/director/bareos-dir.conf)
+	cat << EOF > $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bconsole.conf
+
+Director {
+  Name = bareos-dir
+  address = ${SERVER}
+$CONSOLE_PW_LINE
+  Description = "Bareos Console credentials for ${SERVER} Director"
+}
+
+EOF
 	# Create Logfile entry in Standard-Message file for client
 	mkdir -p ${BAREOS_EXPORT_DIR}/client/${CLIENT}-fd/bareos-fd.d/messages
 	cat << EOF > ${BAREOS_EXPORT_DIR}/client/${CLIENT}-fd/bareos-fd.d/messages/Standard.conf
@@ -269,14 +282,14 @@ EOF
 		# BareOS Version 16 and later
 		rsync -r  /etc/logrotate.d/bareos-dir root@$CLIENT:/etc/logrotate.d/
 		rsync -r  $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d root@$CLIENT:/etc/bareos/
+		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bconsole.conf | ssh root@${CLIENT} 'cat >> /etc/bareos/bconsole.conf'
 		ssh root@${CLIENT} bash << EOF
 chown -R bareos. /etc/bareos
 service bareos-fd restart
 EOF
 	else
 		# BareOS Version 14 and earlier
-		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf|grep -v "ConnectionFromClientToDirector"\ 
-		| ssh root@coiner16 'cat >> /etc/bareos/bareos-fd.conf'
+		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf|grep -v "ConnectionFromClientToDirector" | ssh root@coiner16 'cat >> /etc/bareos/bareos-fd.conf'
 		ssh root@${CLIENT} bash << EOF
 chown -R bareos. /etc/bareos
 service bareos-fd restart
