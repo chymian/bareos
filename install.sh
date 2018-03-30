@@ -215,7 +215,7 @@ install_webui() {
 	cd /etc/apache2
 	sed -i s/80/81/g ports.conf
 	sed -i s/443/8443/g ports.conf
-	which a2dissite && 2dissite  000-default
+	which a2dissite && a2dissite  000-default
 	which a2enmod && a2enmod proxy_fcgi setenvif
 	which a2enconf && a2enconf php7.0-fpm
 	which a2enmod && a2enmod rewrite setenv php7 2> /dev/null || true
@@ -254,9 +254,17 @@ configure_base() {
 	for i in `grep bareos-mon -lr * `; do sed -i s/bareos-mon/$SERVER-mon/g $i; done
 	for i in `grep bareos-sd  -lr * `; do sed -i s/bareos-sd/$SERVER-sd/g $i; done
 
+	# make sure, fileset ist set in Job "backup-$SERVER-fd"
+	mv $BAREOS_DIR_DIR/job/backup-bareos-fd.conf $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf
+	if [ `grep -ci fileset $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf` = 1 ] ; then
+		sed -i "s/.ile.et.*/FileSet = LinuxHC/g" $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf
+	else
+		sed -i "s/\}/  FileSet = LinuxHC\n  \}/g" $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf
+	fi
+
 	# if running on OMV/armbian HC1, use special job for host
 	if [ -d /etc/openmediavault -a -f /etc/armbian.txt ]; then
-		mv $BAREOS_DIR_DIR/job/backup-bareos-fd.conf   $BAREOS_DIR_DIR/job/backup-bareos-fd.conf.dist
+		mv $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf   $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf.dist
 		mv $BAREOS_DIR_DIR/job/backup-OMV-fd.conf.dist $BAREOS_DIR_DIR/job/backup-OMV-fd.conf
 	fi
 
@@ -266,14 +274,6 @@ configure_base() {
 	else
 		sed -i "s/Level/Client = $SERVER-fd\n  Level/g" $BAREOS_DIR_DIR/job/BackupCatalog.conf
 	fi
-	# make sure, fileset ist set in Job "backup-$SERVER-fd"
-	mv $BAREOS_DIR_DIR/job/backup-bareos-fd.conf $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf
-	if [ `grep -ci fileset $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf` = 1 ] ; then
-		sed -i "s/.ile.et.*/FileSet = LinuxHC/g" $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf
-	else
-		sed -i "s/\}/  FileSet = LinuxHC\n  \}/g" $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf
-	fi
-
 echo "## BareOS Services Passwords
 \`\`\`" >> $CONFIG_DOC
 for i in DIRECTOR CLIENT STORAGE ; do
@@ -298,6 +298,7 @@ PostgreSQL: $(apt-cache show policy postgresql|grep Version|awk '{print $2}')
 \`\`\`
 A tarball of the configuration Directory \'$BAREOS_BASE_DIR\' is available at [http://$SERVER:81/$CFG_TAR](http://$SERVER:81/$CFG_TAR)
 ---
+
 This Page is also availlable on: [http://$SERVER:81/$(basename $CONFIG_DOC .md).html](http://$SERVER:81/$(basename $CONFIG_DOC .md).html)
 
 ***
@@ -334,4 +335,4 @@ finish_docu() {
 
 # Main
 main
-
+restart_daemons

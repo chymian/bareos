@@ -6,7 +6,7 @@ Job {
   Client Run Before Job = "/sbin/folder2ram -syncall"
   Client Run Before Job = "bash -c '/bin/btrfs sub del /.bareos-snap || true'"
   Client Run Before Job = "/bin/btrfs sub snap -r / /.bareos-snap"
-  Client Run Before Job = "mkdir -p /mnt/.shadow/
+  Client Run Before Job = "mkdir -p /mnt/.shadow/"
   Client Run Before Job = "mount /.bareos-snap /mnt/.shadow -o bind"
   Client Run After Job = "umount /mnt/.shadow"
   Description = "OMV/HomeCloud only: Create a shadow mounted /-snapshot"
