@@ -235,7 +235,8 @@ install_webui() {
 	echo $WEBUI_PW | htpasswd -i -c /var/www/html/.htpasswd admin
 
 	# allow htauth
-	cat << EOF | ssh root@${SERVER} 'cd /etc/apache2/ ; patch -bp3'
+	cd /etc/apache2/
+	cat << EOF | patch -bp3
 --- /tmp/apache2/apache2.conf	2018-03-31 15:54:33.916158385 +0200
 +++ /etc/apache2/apache2.conf	2018-03-31 16:20:46.510808974 +0200
 @@ -169,7 +169,7 @@
@@ -266,7 +267,7 @@ install_webui() {
 EOF
 
 
-	cat << EOF | ssh root@${SERVER} 'cat - > /var/www/html/.htaccess'
+	cat << EOF | cat - > /var/www/html/.htaccess
 AuthType Basic
 AuthName "Restricted Content"
 AuthUserFile /var/www/html/.htpasswd
