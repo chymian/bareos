@@ -92,7 +92,7 @@ main() {
 install_prereq() {
 echo "# BareOS Backup Server
 
-## Installationprotocoll
+## Installationprotocol
 \`\`\`
 on:              $SERVER
 Date:            `date`
@@ -150,7 +150,8 @@ BarOS Version:   16.2
 	}
 
 
-echo "## Targets are mounted under \`/var/lib/bareos\` and available on:
+echo "## Targets  
+are mounted under \`/var/lib/bareos\` and available on:  
 \`\`\`
 Backup Volume:       $BACKUP_VOL
 Backup Target:       $BACKUP_TGT
@@ -274,7 +275,7 @@ configure_base() {
 	else
 		sed -i "s/Level/Client = $SERVER-fd\n  Level/g" $BAREOS_DIR_DIR/job/BackupCatalog.conf
 	fi
-echo "## BareOS Services Passwords
+echo "## Services Passwords  
 \`\`\`" >> $CONFIG_DOC
 for i in DIRECTOR CLIENT STORAGE ; do
 	printf "${i}_PASSWORD:\t\t$(grep ${i}_PASSWORD $BAREOS_BASE_DIR/.rndpwd|cut -d"=" -f2)\n" >> $CONFIG_DOC
@@ -296,8 +297,8 @@ OS:         $(lsb_release -d|awk '{print $2,$3,$4,$5}')
 BareOS:     $(apt-cache show policy bareos|grep Version|awk '{print $2}')
 PostgreSQL: $(apt-cache show policy postgresql|grep Version|awk '{print $2}')
 \`\`\`
+
 A tarball of the configuration Directory \'$BAREOS_BASE_DIR\' is available at [http://$SERVER:81/$CFG_TAR](http://$SERVER:81/$CFG_TAR)
----
 
 This Page is also availlable on: [http://$SERVER:81/$(basename $CONFIG_DOC .md).html](http://$SERVER:81/$(basename $CONFIG_DOC .md).html)
 

@@ -268,8 +268,11 @@ EOF
 EOF
 
 	echo "## Bareos-Client-SW installed
-	ClientSW installed:   yes
-	***
+\`\`\`
+ClientSW installed:   yes
+\`\`\`
+
+***
 " >> $CONFIG_DOC
 }
 
