@@ -55,7 +55,7 @@ GIT_REPO="https://github.com/chymian/$GIT_REPO_NAME"
 # miscellanious
 BAREOS_USER="bareos"
 BAREOS_BASE_DIR="/etc/bareos"
-BAREOSDIR_DIR="$BAREOS_BASE_DIR/bareos-dir.d"
+BAREOS_DIR_DIR="$BAREOS_BASE_DIR/bareos-dir.d"
 
 PREREQ="pwgen uuid-runtime git make mailutils pandoc"
 agi='apt-get install --yes --force-yes --allow-unauthenticated  --fix-missing --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold'
@@ -244,29 +244,34 @@ WebUI Password: $WEBUI_PW
 
 
 configure_base() {
-	# Changing Directory-Name from bareos to hostname
-	cd /etc/bareos
-	for i in `grep bareos-fd -lr * `; do sed -i s/bareos-fd/$SERVER-fd/g $i; done
-	for i in `grep bareos-dir -lr * `; do sed -i s/bareos-dir/$SERVER-dir/g $i; done
-	for i in `grep bareos-mon -lr * `; do sed -i s/bareos-mon/$SERVER-mon/g $i; done
-	for i in `grep bareos-sd -lr * `; do sed -i s/bareos-sd/$SERVER-sd/g $i; done
-
 	# copy the sample-configs to $BAREOS_BASE_DIR
 	cp --backup=t -a $SAMPLE_DIR/* $BAREOS_BASE_DIR
 
+	# Changing Directory-Name from bareos to hostname
+	cd $BAREOS_BASE_DIR
+	for i in `grep bareos-fd  -lr * `; do sed -i s/bareos-fd/$SERVER-fd/g $i; done
+	for i in `grep bareos-dir -lr * `; do sed -i s/bareos-dir/$SERVER-dir/g $i; done
+	for i in `grep bareos-mon -lr * `; do sed -i s/bareos-mon/$SERVER-mon/g $i; done
+	for i in `grep bareos-sd  -lr * `; do sed -i s/bareos-sd/$SERVER-sd/g $i; done
+
+	# if running on OMV/armbian HC1, use special job for host
+	if [ -d /etc/openmediavault -a -f /etc/armbian.txt ]; then
+		mv $BAREOS_DIR_DIR/job/backup-bareos-fd.conf   $BAREOS_DIR_DIR/job/backup-bareos-fd.conf.dist
+		mv $BAREOS_DIR_DIR/job/backup-OMV-fd.conf.dist $BAREOS_DIR_DIR/job/backup-OMV-fd.conf
+	fi
 
 	# make sure, client is set in job/BackupCatalog.conf
-	if [ `grep -ci client $BAREOSDIR_DIR/job/BackupCatalog.conf` = 1 ] ; then
-		sed -i "s/.ient.*/lient = $SERVER-fd/g" $BAREOSDIR_DIR/job/BackupCatalog.conf
+	if [ `grep -ci client $BAREOS_DIR_DIR/job/BackupCatalog.conf` = 1 ] ; then
+		sed -i "s/.ient.*/lient = $SERVER-fd/g" $BAREOS_DIR_DIR/job/BackupCatalog.conf
 	else
-		sed -i "s/Level/Client = $SERVER-fd\n  Level/g" $BAREOSDIR_DIR/job/BackupCatalog.conf
+		sed -i "s/Level/Client = $SERVER-fd\n  Level/g" $BAREOS_DIR_DIR/job/BackupCatalog.conf
 	fi
 	# make sure, fileset ist set in Job "backup-$SERVER-fd"
-	mv $BAREOSDIR_DIR/job/backup-bareos-fd.conf $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
-	if [ `grep -ci fileset $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf` = 1 ] ; then
-		sed -i "s/.ile.et.*/FileSet = LinuxHC/g" $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
+	mv $BAREOS_DIR_DIR/job/backup-bareos-fd.conf $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf
+	if [ `grep -ci fileset $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf` = 1 ] ; then
+		sed -i "s/.ile.et.*/FileSet = LinuxHC/g" $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf
 	else
-		sed -i "s/\}/  FileSet = LinuxHC\n  \}/g" $BAREOSDIR_DIR/job/backup-${SERVER}-fd.conf
+		sed -i "s/\}/  FileSet = LinuxHC\n  \}/g" $BAREOS_DIR_DIR/job/backup-${SERVER}-fd.conf
 	fi
 
 echo "## BareOS Services Passwords
