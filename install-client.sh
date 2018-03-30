@@ -261,23 +261,23 @@ apt-get -y install bareos-client
 EOF
 
 	# Config-File layout according to Verseion
-	# <= 14.2 == directorystructur
-	# >= 16.2 == directorystructur
-	if [[ $(echo ${BAREOS_INFO[2]}) >= 16 ]] ; then
+	# <= 14.2 == file-structur
+	# >= 16.2 == directory-structur
+	#if [[ $(echo ${BAREOS_INFO[2]}) >= 16 ]] ; then
 		# Copy Dirctory Stanza to Client
 		rsync -r  $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d root@$CLIENT:/etc/bareos/
 		ssh root@${CLIENT} bash << EOF
 chown -R bareos. /etc/bareos
 service bareos-fd restart
 EOF
-	else
-		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf|grep -v "ConnectionFromClientToDirector"\ 
-		| ssh root@coiner16 'cat >> /etc/bareos/bareos-fd.conf'
-		ssh root@${CLIENT} bash << EOF
-chown -R bareos. /etc/bareos
-service bareos-fd restart
-EOF
-	fi
+#	else
+#		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf|grep -v "ConnectionFromClientToDirector"\ 
+#		| ssh root@coiner16 'cat >> /etc/bareos/bareos-fd.conf'
+#		ssh root@${CLIENT} bash << EOF
+#chown -R bareos. /etc/bareos
+#service bareos-fd restart
+#EOF
+#	fi
 	echo "## Bareos-Client-SW installed
 \`\`\`
 ClientSW installed:   yes
