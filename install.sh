@@ -266,9 +266,12 @@ install_webui() {
 EOF
 
 
-
-
-#	cat << EOF | ssh root@${SERVER} patch -bp1 /etc/apache2/sites-available/000-default
+	cat << EOF | ssh root@${SERVER} 'cat - > /var/www/html/.htaccess'
+AuthType Basic
+AuthName "Restricted Content"
+AuthUserFile /var/www/html/.htpasswd
+Require valid-user
+EOF
 
 #	sed "s#</VirtualHost>#\n    <Directory \"/var/www/html\">\n\
 #        AuthType Basic\n\
