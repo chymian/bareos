@@ -58,11 +58,11 @@ clientname can be a resolvable Hostname or an IP-Address.
    -h           Show this message.
    -j <jobdef>  Use Jobdef <jobdef> instaed of Default JobDef
    -l           List JobDefs and FileSets
-   -m           Mail the updated Config-Docu and config-tarball
+   -m           Mail the updated Config-Docu and config-tarball (use as only switch)
    -s           Setup Client with bareos-fd & copy Director-definition to it
 
 Docu & config-Tarball are not automatically updated.
-Use \"-m\" on last client or by it's own at the end of your Setups.
+Use \"-m\" on it's own at the end of your Setups to mail you the configs.
 
 "
 exit 0
