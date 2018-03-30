@@ -246,7 +246,7 @@ client_setup() {
 
 	echo
 	echo "##################################################################"
-	echo "   Attention: Please give root@{CLIENT} Password, if asked for."
+	echo "   Attention: Please give root@${CLIENT} Password, if asked for."
 	echo "##################################################################"
 	echo
 
