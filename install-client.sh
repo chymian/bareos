@@ -177,11 +177,11 @@ EOF
 	sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  Address = ${SERVER}\n}/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
 
 	# Create a bconsole-stanza for this director
-	CONSOLE_PW_LINE="$(grep Password ${BASE_DIR}/bareos-dir.d/director/bareos-dir.conf)"
+	CONSOLE_PW_LINE="$(grep -i Password ${BAREOS_DIR_DIR}/director/bareos-dir.conf)"
 	cat << EOF > $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bconsole.conf
 
 Director {
-  Name = bareos-dir
+  Name = ${SERVER}-dir
   address = ${SERVER}
 ${CONSOLE_PW_LINE}
   Description = "Bareos Console credentials for ${SERVER} Director"
