@@ -260,19 +260,21 @@ apt-get update >> /dev/null
 apt-get -y install bareos-client
 EOF
 
+	# Copy Dirctory Stanza to Client & configure logrotate
 	# Config-File layout according to Verseion
-	# <= 14.2 == file-structur
-	# >= 16.2 == directory-structur
+	# <= 14 == file-structur
+	# >= 16 == directory-structur
 	BAREOS_INFO=(`ssh root@${CLIENT} 'apt-cache policy bareos-client'`);
-	if [[ $(echo ${BAREOS_INFO[2]}) >= 16 ]] ; then
+	if [[ ${BAREOS_INFO[2]:0:2} -ge 16 ]] ; then
+		# BareOS Version 16 and later
 		rsync -r  /etc/logrotate.d/bareos-dir root@$CLIENT:/etc/logrotate.d/
 		rsync -r  $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d root@$CLIENT:/etc/bareos/
-		# Copy Dirctory Stanza to Client & configure logrotate
 		ssh root@${CLIENT} bash << EOF
 chown -R bareos. /etc/bareos
 service bareos-fd restart
 EOF
 	else
+		# BareOS Version 14 and earlier
 		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf|grep -v "ConnectionFromClientToDirector"\ 
 		| ssh root@coiner16 'cat >> /etc/bareos/bareos-fd.conf'
 		ssh root@${CLIENT} bash << EOF
@@ -287,7 +289,7 @@ ClientSW installed:   yes
 
 ***
 " >> $CONFIG_DOC
-}
+} # client_setup
 
 finish_docu() {
 	cd /etc
