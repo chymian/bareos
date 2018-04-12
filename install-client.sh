@@ -147,6 +147,8 @@ main() {
 		exit 2
 	elif [ "$1" != "" ]; then
 		CLIENT=$1
+		# use client pw from definition, or check, whether it already exists
+		CLIENT_PW=${CLIENT_PW:-$(client_getpw $CLIENT)}
 		#echo "NoOption Arg: '$1', Clientname: $CLIENT"
 		#echo "calling client_add with: " "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
 		client_add "$CLIENT" "${CLIENT_PW:-$(pwgen -1 45)}" "${CLIENT_INI_CONN:-${CLIENT_INI_CONN}}"
@@ -162,6 +164,11 @@ main() {
 
 } #main
 
+client_getpw() {
+	grep Password ${BAREOS_DIR_DIR}/client/${CLIENT}-fd.conf) | awk '{ print $3 }'
+} # client_getpw
+
+
 client_add() {
 	if [ "$3"="yes" ]; then
 		bconsole << EOF
@@ -174,7 +181,9 @@ configure add client \
 reload
 EOF
 	# add CIC & Address in exported-file
-	sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  Address = ${SERVER}\n}/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
+	grep ConnectionFromClientToDirector $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf && {
+		sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  Address = ${SERVER}\n}/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
+	}
 
 	# Create a bconsole-stanza for this director
 	CONSOLE_PW_LINE="$(grep -i Password ${BAREOS_DIR_DIR}/director/bareos-dir.conf)"
