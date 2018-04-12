@@ -181,7 +181,7 @@ configure add client \
 reload
 EOF
 	# add CIC & Address in exported-file
-	grep ConnectionFromClientToDirector $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf && {
+	grep -q ConnectionFromClientToDirector $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf || {
 		sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  Address = ${SERVER}\n}/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
 	}
 
