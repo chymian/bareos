@@ -165,7 +165,7 @@ main() {
 } #main
 
 client_getpw() {
-	grep Password ${BAREOS_DIR_DIR}/client/${CLIENT}-fd.conf) | awk '{ print $3 }'
+	grep Password ${BAREOS_DIR_DIR}/client/${CLIENT}-fd.conf | awk '{ print $3 }'
 } # client_getpw
 
 
