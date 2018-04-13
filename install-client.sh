@@ -291,15 +291,15 @@ EOF
 		# BareOS Version 16 and later
 		rsync -r  /etc/logrotate.d/bareos-dir root@$CLIENT:/etc/logrotate.d/
 		rsync -r  $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d root@$CLIENT:/etc/bareos/
-		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bconsole.conf | ssh root@${CLIENT} 'cat >> /etc/bareos/bconsole.conf'
+		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bconsole.conf | ssh root@${CLIENT} 'cat > /etc/bareos/bconsole.conf'
 		ssh root@${CLIENT} bash << EOF
 chown -R bareos. /etc/bareos
 service bareos-fd restart
 EOF
 	else
 		# BareOS Version 14 and earlier
-		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf|grep -v "ConnectionFromClientToDirector" | ssh root@coiner16 'cat >> /etc/bareos/bareos-fd.conf'
-		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bconsole.conf | ssh root@${CLIENT} 'cat >> /etc/bareos/bconsole.conf'
+		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf|grep -v "ConnectionFromClientToDirector" | ssh root@${CLIENT} 'cat >> /etc/bareos/bareos-fd.conf'
+		cat $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bconsole.conf | ssh root@${CLIENT} 'cat > /etc/bareos/bconsole.conf'
 		ssh root@${CLIENT} bash << EOF
 chown -R bareos. /etc/bareos
 service bareos-fd restart
