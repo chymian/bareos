@@ -1,6 +1,6 @@
 # eb8's BareOS install Cheatsheet
 
-This is based on an armbian based Openmediavault Installation, but should work on any Debian Stretch or newer.
+This is based on an armbian based OpenMediaVault Installation, but should work on any Debian Stretch or newer.
 
 ## Prerequisites  
 Minimum Setup for OMV:  
@@ -11,7 +11,8 @@ Minimum Setup for OMV:
 5) Setup eMail-Notifications in OMV: the install script sends the installation Protocol & a tarball of /etc/bareos upon completion.
 6) Create a Backup-Partiton on the RAID/Disk with label **backup** and mount it.  
 7) Enable SSH root login.  
-8) SSH to the server as root and run ./run-once.sh (on Armbian/OMV only).  
+8) SSH to the server as root with the Password "openmediavault", change the root password `passwd`  
+9) and run `./run-once.sh [hostname]` (on Armbian/OMV only).  
 
 ## Install the BareOS Server  
 This installes the BareOS-Server with WebUI and a set of Sample-Configs ready to be used with Clients, which are installed in the next step.
@@ -21,7 +22,7 @@ cd bareos
 ./install.sh
 ```
 During Installation of the PostGreSQL, you get asked some Questions:  
-Use the Defaults, note down your password.
+Use the Defaults, note down your DB-password.
 
 ## Install Clients  
 ```
@@ -31,16 +32,21 @@ Setup a Job for client with the defaults JobDef: DefaultJob and FileSet: LinuxAl
 clientname can be a resolvable Hostname or an IP-Address.
 
    -c           Use "Client initiated Connections" for "not always on hosts", like Laptops, VM, etc.
-   -f <fileset> Use FileSet <fileset> instaed of Default FileSet
+   -f <fileset> Use FileSet <fileset> instead of Default FileSet
    -h           Show this message.
-   -j <jobdef>  Use Jobdef <jobdef> instaed of Default JobDef
-   -l           List JobDefs and FileSets
-   -m           Mail the updated Config-Docu and config-tarball (use as only switch)
-   -s           Setup Client with bareos-fd & copy Director-definition to it
+   -j <jobdef>  Use Jobdef <jobdef> instead of Default JobDef
+   -l           List all available JobDefs and FileSets
+   -m           Mail the updated Config-Docu and config-tarball (use as sole switch)
+   -s           Setup Bareos-Client SW on the client & copy Director-definition to it. (needs ssh-access)
 
 Docu & config-Tarball are not automatically updated.
-Use "-m" on it's own at the end of your Setups to mail you the configs.
+Use "-m" on it's own at the end of your Setups to mail you the updated configs.
 ```
+
+`./install-client.sh -s -c -j DefaultJob-Hourly strepl`  
+Configures the Client "strepl" on the Bareos-Director with the Hourly Jobdef and installes the `bareos-client` Software on the Client and configuring it.
+Ready to go.
+
 
 ### Change BackupTime
 * defaults to 20:00

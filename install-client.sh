@@ -54,15 +54,15 @@ Setup a Job for client with the defaults JobDef: $DEFAULT_JOBDEF and FileSet: $D
 clientname can be a resolvable Hostname or an IP-Address.
 
    -c		Use \"Client initiated Connections\" for \"not always on hosts\", like Laptops, VM, etc.
-   -f <fileset> Use FileSet <fileset> instaed of Default FileSet
+   -f <fileset> Use FileSet <fileset> instead of Default FileSet
    -h           Show this message.
-   -j <jobdef>  Use Jobdef <jobdef> instaed of Default JobDef
-   -l           List JobDefs and FileSets
+   -j <jobdef>  Use Jobdef <jobdef> instead of Default JobDef
+   -l           List all available JobDefs and FileSets
    -m           Mail the updated Config-Docu and config-tarball (use as only switch)
-   -s           Setup Client with bareos-fd & copy Director-definition to it
+   -s           Setup Bareos-Client SW on the client & copy Director-definition to it. (needs ssh-access)
 
 Docu & config-Tarball are not automatically updated.
-Use \"-m\" on it's own at the end of your Setups to mail you the configs.
+Use \"-m\" on it's own at the end of your Setups to mail you the updated configs.
 
 "
 exit 0
