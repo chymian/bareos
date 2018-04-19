@@ -326,6 +326,12 @@ configure_base() {
 	else
 		sed -i "s/Level/Client = $SERVER-fd\n  Level/g" $BAREOS_DIR_DIR/job/BackupCatalog.conf
 	fi
+
+	# setup messaging email, needs OMV messaging set up
+	MAILFROM=$(grep sender /etc/openmediavault/config.xml |cut -d">" -f2|cut -d"<" -f1)
+	sed -i "s/@localhost//g" $BAREOS_DIR_DIR/messages/*
+	sed -i "s/-f.*-s/-f $MAILFROM -s/g" $BAREOS_DIR_DIR/messages/*
+
 echo "## Services Passwords  
 \`\`\`" >> $CONFIG_DOC
 for i in DIRECTOR CLIENT STORAGE ; do
