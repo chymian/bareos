@@ -52,5 +52,5 @@ Ready to go.
 * defaults to 20:00
 ```
 TIME="19:00"
-sed -i s/at ..:../$TIME/g /etc/bareos/bareos-dir.d/schedule/*
+sed -i "s/at ..:../at $TIME/g" /etc/bareos/bareos-dir.d/schedule/*
 ```
