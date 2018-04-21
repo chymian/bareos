@@ -315,7 +315,7 @@ chown -R bareos. /etc/bareos
 service bareos-fd restart
 EOF
 	fi
-	echo "## Bareos-Client-SW installed
+	echo "### Bareos-Client-SW installed
 \`\`\`
 ClientSW installed:   yes
 \`\`\`
