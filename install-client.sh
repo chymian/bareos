@@ -190,18 +190,6 @@ EOF
 		sed -i "s/\}/  ConnectionFromClientToDirector = yes\n  Address = ${SERVER}\n}/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
 	}
 
-	# Create a bconsole-stanza for this director
-	CONSOLE_PW_LINE="$(grep -i Password ${BAREOS_DIR_DIR}/director/bareos-dir.conf)"
-	cat << EOF > $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bconsole.conf
-
-Director {
-  Name = ${SERVER}-dir
-  address = ${SERVER}
-${CONSOLE_PW_LINE}
-  Description = "Bareos Console credentials for ${SERVER} Director"
-}
-
-EOF
 	# Create Logfile entry in Standard-Message file for client
 	mkdir -p ${BAREOS_EXPORT_DIR}/client/${CLIENT}-fd/bareos-fd.d/messages
 	cat << EOF > ${BAREOS_EXPORT_DIR}/client/${CLIENT}-fd/bareos-fd.d/messages/Standard.conf
@@ -220,10 +208,23 @@ configure add client \
   password=$2 \
   AutoPrune=yes
   JobRetention="${DEFAULT_RETENTION_JOB}" \
-  FileRetention="${DEFAULT_RETENTION_FILE}" 
+  FileRetention="${DEFAULT_RETENTION_FILE}"
 reload
 EOF
 	fi
+
+	# Create a bconsole-stanza for this director
+	CONSOLE_PW_LINE="$(grep -i Password ${BAREOS_DIR_DIR}/director/bareos-dir.conf)"
+	cat << EOF > $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bconsole.conf
+
+Director {
+  Name = ${SERVER}-dir
+  address = ${SERVER}
+${CONSOLE_PW_LINE}
+  Description = "Bareos Console credentials for ${SERVER} Director"
+}
+
+EOF
 	sed -i "s/Password =.*/Password = $2/g" $BAREOS_EXPORT_DIR/client/${CLIENT}-fd/bareos-fd.d/director/${SERVER}-dir.conf
 echo "
 ## Client $1 added
@@ -233,6 +234,8 @@ Date:            `date`
 Hostname/IP:                  $1
 ClientPW:                     $2
 Client initiated Connections: $3
+Job Retention:                ${DEFAULT_RETENTION_JOB}
+File Retention:               ${DEFAULT_RETENTION_FILE}
 \`\`\`
 " >> $CONFIG_DOC
 
@@ -246,7 +249,7 @@ configure add job \
   Name="backup-${1}-fd" \
   JobDefs="${2}" \
   FileSet="${3}" \
-  Description="Standard hourly Backup"
+  Description="Standard Backup"
 reload
 EOF
 
