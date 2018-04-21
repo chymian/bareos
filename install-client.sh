@@ -15,7 +15,7 @@ DEFAULT_JOBDEF=DefaultJob
 DEFAULT_SCHEDULE=WeeklyCycle
 DEFAULT_FILESET=LinuxAll
 CLIENT_INI_CONN=no
-RETENTION_JOB="6 month"
+RETENTION_JOB="6 months"
 RETENTION_FILE="60 days"
 
 # Tuneable varibales
@@ -179,8 +179,8 @@ configure add client \
   address=$1 \
   password=$2 \
   AutoPrune=yes \
-  JobRetention=$RETENTION_JOB
-  FileRetention=$RETENTION_FILE
+  JobRetention="${RETENTION_JOB}"
+  FileRetention="${RETENTION_FILE}"
   ConnectionFromClientToDirector=yes
   HeartbeatInterval=60
 reload
