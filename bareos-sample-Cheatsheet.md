@@ -49,8 +49,8 @@ Ready to go.
 
 
 ### Change BackupTime
-* defaults to 20:00
+* defaults to 16:00
 ```
-TIME="19:00"
+TIME="13:00"
 sed -i "s/at ..:../at $TIME/g" /etc/bareos/bareos-dir.d/schedule/*
 ```
