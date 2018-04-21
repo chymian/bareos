@@ -219,6 +219,8 @@ configure add client \
   address=$1 \
   password=$2 \
   AutoPrune=yes
+  JobRetention="${DEFAULT_RETENTION_JOB}" \
+  FileRetention="${DEFAULT_RETENTION_FILE}" 
 reload
 EOF
 	fi
