@@ -15,6 +15,8 @@ DEFAULT_JOBDEF=DefaultJob
 DEFAULT_SCHEDULE=WeeklyCycle
 DEFAULT_FILESET=LinuxAll
 CLIENT_INI_CONN=no
+RETENTION_JOB="6 month"
+RETENTION_FILE="60 days"
 
 # Tuneable varibales
 BACKUP_VOL="/srv/dev-disk-by-label-backup"
@@ -177,6 +179,8 @@ configure add client \
   address=$1 \
   password=$2 \
   AutoPrune=yes \
+  JobRetention=$RETENTION_JOB
+  FileRetention=$RETENTION_FILE
   ConnectionFromClientToDirector=yes
 reload
 EOF
