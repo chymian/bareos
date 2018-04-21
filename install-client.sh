@@ -182,6 +182,7 @@ configure add client \
   JobRetention=$RETENTION_JOB
   FileRetention=$RETENTION_FILE
   ConnectionFromClientToDirector=yes
+  HeartbeatInterval=60
 reload
 EOF
 	# add CIC & Address in exported-file
