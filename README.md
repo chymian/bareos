@@ -408,16 +408,25 @@ bconsole
 <div class="page-break"></div>
 
 ## ToDo  
-* LongTerm retentionTime must be longer then longest Vacation
-* Base Backups  
-* Client initiated Connections
-if datavolume is not so big,
-* incremental filesize = 200M (wg. retentionTime)
-* Differential filesize = 500M
-* Full filesize= 10G
+* switched from given size for Volumes to "Volume Use Duration" -> adapt this doc. see [Automated Disk backups](http://doc.bareos.org/master/html/bareos-manual-main-reference.html#QQ2-1-458)
+**HINT:** It has a flaw with writung the catalog to a new FullBackupPool-Volume every day.   
+-> Use a Catalog-Pool.
+* LongTerm retentionTime must be longer then longest Vacation (deprecated?)
+* Base Backups  (only usefull with windows installations)
+* use snapper to create ans mount snapshots of subvols.
+restrict snapper to 24 x hourly snapshots, since quota ist not working correctly (doublecheck)
+* for universal fileset -> use /etc/snapper/configs to determine which volumes to backup (FileSets with client-executed cmd)
+* encryption  
+
+* ~~Client initiated Connections~~
+~~if datavolume is not so big,~~
+* ~~incremental filesize = 200M (wg. retentionTime)~~
+* ~~Differential filesize = 500M~~
+* ~~Full filesize= 10G~~
+
 
 #### Writing Bootstrap files (to REAR-USB?)
-Create better bootstrap-files and copy them to REAR-USB.  
+Create better bootstrap-files and copy them to REAR-USB or /etc/rear/.  
 see [about bootstrap files](http://doc.bareos.org/master/html/bareos-manual-main-reference.html#x1-555000D)
 
 #### Backing up VPS & LXCs
@@ -469,4 +478,14 @@ To ask Bareos to truncate your Purged volumes, you need to use the following:
 for i in `echo list pools |bconsole|tail  -n8|awk '{print $4}'`; do
   echo "purge volume action=truncate storage=File pool=$i"|bconsole
 done
+```
+
+#### Delete Volumes from Catalog and FS hereafter
+```
+VOLUME=Full-0001
+echo "delete volume=$VOLUME"|bconsole
+#FIXME
+# purge Volume?
+#rm /var/lib/bareos/storage/$Volume
+
 ```

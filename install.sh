@@ -330,7 +330,7 @@ configure_base() {
 	# setup messaging email, needs OMV messaging set up
 	MAILFROM=$(grep sender /etc/openmediavault/config.xml |cut -d">" -f2|cut -d"<" -f1)
 	sed -i "s/@localhost//g" $BAREOS_DIR_DIR/messages/* $BAREOS_DIR_DIR/job/*
-	sed -i "s/-f.*-s/-f $MAILFROM -s/g" $BAREOS_DIR_DIR/messages/*
+	sed -i "s/-f.*-s/-f $MAILFROM -s/g" $BAREOS_DIR_DIR/messages/* $BAREOS_DIR_DIR/job/*
 
 echo "## Services Passwords  
 \`\`\`" >> $CONFIG_DOC
