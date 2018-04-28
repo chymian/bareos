@@ -224,7 +224,7 @@ install_webui() {
 	which a2enconf && a2enconf bareos-webui
 	service  apache2 restart
 
-
+	reload_director
 	# generate a PW if empty
 	WEBUI_PW=${WEBUI_PW:-$(pwgen -1 12)}
 
