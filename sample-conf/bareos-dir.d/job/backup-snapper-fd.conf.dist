@@ -1,0 +1,22 @@
+Job {
+  Name = "backup-OMV-fd"
+  JobDefs = "DefaultJob"
+  #FIXME
+  Client = "SNAPPER-fd"
+  FileSet = LinuxAll-snapper
+  Description = "Snapper-supported systems only: Create snapshots & mount them under /mnt/.shadow"
+
+  # create snapper-snapshots
+  Client Run Before Job = "/usr/bin/snapper -c root    create -d "bareOS" -c timeline -u bareos=yes"
+  Client Run Before Job = "/usr/bin/snapper -c home    create -d "bareOS" -c timeline -u bareos=yes"
+  Client Run Before Job = "/usr/bin/snapper -c libvirt create -d "bareOS" -c timeline -u bareos=yes"
+  Client Run Before Job = "mkdir -p /mnt/.shadow/ || true"
+  # mount before
+  Client Run Before Job = "sh -c 'PART=/                ; mount $PART/.snapshots/$(ls -tr $PART/.snapshots/| tail -n1)/snapshot /mnt/.shadow/$PART/ -o bind'"
+  Client Run Before Job = "sh -c 'PART=/home            ; mount $PART/.snapshots/$(ls -tr $PART/.snapshots/| tail -n1)/snapshot /mnt/.shadow/$PART/ -o bind'"
+  Client Run Before Job = "sh -c 'PART=/var/lib/libvirt ; mount $PART/.snapshots/$(ls -tr $PART/.snapshots/| tail -n1)/snapshot /mnt/.shadow/$PART/ -o bind'"
+  # umount after
+  Client Run After Job  = "sh -c 'PART=/                ; umount /mnt/.shadow/$PART'"
+  Client Run After Job  = "sh -c 'PART=/home            ; umount /mnt/.shadow/$PART'"
+  Client Run After Job  = "sh -c 'PART=/var/lib/libvirt ; umount /mnt/.shadow/$PART'"
+  }
